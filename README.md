@@ -203,3 +203,4 @@ The automated pipeline tests census totals against official statistical publicat
 * **Health & Wellbeing:** The DHS Program (USAID / ICF) REST API (`https://api.dhsprogram.com`).
 * **Settlements:** OpenStreetMap contributors via Humanitarian OpenStreetMap Team (ODbL 1.0).
 * Full source registry and download URLs available in [`/data/SOURCES.md`](file:///d:/East%20Africa%20Demographic%20Map/data/SOURCES.md).
+

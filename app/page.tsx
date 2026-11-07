@@ -94,7 +94,12 @@ export default function HomePage() {
         const country = COUNTRIES[selectedCountry];
         const lvl = country?.levels[selectedLevel];
         if (lvl) {
-          filePath = lvl.file;
+          // If drilling down into a specific parent unit at lower levels, lazy load that parent's partitioned file
+          if (parentFilterId && selectedLevel > 1 && !lvl.is_point) {
+            filePath = `/data/processed/${selectedCountry}/level${selectedLevel}_by_parent/${parentFilterId}.geojson`;
+          } else {
+            filePath = lvl.file;
+          }
         }
       }
 
@@ -104,7 +109,15 @@ export default function HomePage() {
       }
 
       try {
-        const res = await fetch(filePath);
+        let res = await fetch(filePath);
+        // Fallback to consolidated file if partition doesn't exist
+        if (!res.ok && parentFilterId && selectedLevel > 1) {
+          const fallbackPath = COUNTRIES[selectedCountry]?.levels[selectedLevel]?.file;
+          if (fallbackPath) {
+            res = await fetch(fallbackPath);
+          }
+        }
+
         if (res.ok) {
           const data = await res.json();
           setRawGeojson(data);
@@ -119,7 +132,7 @@ export default function HomePage() {
     };
 
     fetchLayer();
-  }, [selectedCountry, selectedLevel]);
+  }, [selectedCountry, selectedLevel, parentFilterId]);
 
   // Filter GeoJSON features if drill-down parent filter is active
   const filteredGeojson = useMemo(() => {

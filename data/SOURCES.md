@@ -140,3 +140,4 @@ This register documents all public data sources collected for Kenya, Tanzania, U
 * **Access URL:** https://www.worldpop.org / https://data.humdata.org
 * **Methodology:** High-resolution (1km and 100m) unconstrained dasymetric redistribution using random forest machine learning, calibrated to UN population division estimates.
 * **Use in Pipeline:** Provides independent cross-validation for census polygon totals and consistent cross-country density baselines.
+
