@@ -31,7 +31,7 @@ export default function HomePage() {
   const [baseMapStyle, setBaseMapStyle] = useState<"light" | "dark" | "satellite">("light");
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
-  // Sync GitHub theme with DOM & localStorage on mount
+  // Sync GitHub theme with DOM & localStorage on mount (independent from baseMapStyle)
   useEffect(() => {
     if (typeof window === "undefined") return;
     const saved = localStorage.getItem("gh-theme") as "light" | "dark" | null;
@@ -39,39 +39,28 @@ export default function HomePage() {
     setTheme(preferred);
     if (preferred === "dark") {
       document.documentElement.classList.add("dark");
-      setBaseMapStyle("dark");
     } else {
       document.documentElement.classList.remove("dark");
-      setBaseMapStyle("light");
     }
   }, []);
 
+  // Toggle app theme for navbar, sidebars, controls without changing Base Map Canvas color
   const handleToggleTheme = () => {
     setTheme((prev) => {
       const next = prev === "dark" ? "light" : "dark";
       localStorage.setItem("gh-theme", next);
       if (next === "dark") {
         document.documentElement.classList.add("dark");
-        setBaseMapStyle("dark");
       } else {
         document.documentElement.classList.remove("dark");
-        setBaseMapStyle("light");
       }
       return next;
     });
   };
 
+  // Change Base Map Canvas independently without affecting app UI theme
   const handleChangeBaseMap = (style: "light" | "dark" | "satellite") => {
     setBaseMapStyle(style);
-    if (style === "dark") {
-      setTheme("dark");
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("gh-theme", "dark");
-    } else if (style === "light") {
-      setTheme("light");
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("gh-theme", "light");
-    }
   };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

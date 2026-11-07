@@ -358,8 +358,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="text-[10px] text-[#656d76] dark:text-[#8b949e] mb-1">Base Map Canvas</div>
             <div className="grid grid-cols-3 gap-1">
               {[
-                { id: "light", label: "GitHub Light", icon: Sun },
-                { id: "dark", label: "GitHub Dark", icon: Moon },
+                { id: "light", label: "Light Canvas", icon: Sun },
+                { id: "dark", label: "Dark Canvas", icon: Moon },
                 { id: "satellite", label: "Satellite", icon: Globe }
               ].map((b) => {
                 const Icon = b.icon;
