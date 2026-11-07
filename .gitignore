@@ -21,7 +21,16 @@ dist/
 *.log
 .cache/
 
-# Large raw raster files if any
+# Large raw raster and raw download files
 *.tif
 *.tiff
 *.geotiff
+*.zip
+data/raw/
+!data/SOURCES.md
+
+# Discovery temporary dumps
+data_discovery_*.json
+hdx_summary.json
+dhs_sample.json
+boundaries_metadata_summary.json
