@@ -6,7 +6,14 @@ An interactive, high-performance choropleth web mapping application visualizing 
 
 ## 1. Features & Architecture
 
-* **Harmonized Administrative Hierarchy:**
+* **Dual Rendering Engine:**
+  * **Engine 1 (Google Maps JS API):** Renders high-performance vector polygons on Google Maps Roadmap, Dark, or Satellite hybrid imagery via the Data layer (`map.data.addGeoJson` / `map.data.setStyle`).
+  * **Engine 2 (Instant SVG Vector Choropleth):** True conformal equirectangular projection with cosine latitude compensation that works right out of the box with zero setup or API key requirement. Includes drag pan, scroll wheel zoom, and view reset.
+* **GitHub Primer Design System:**
+  * Authentic GitHub Light and Dark themes with one-click header switcher and automatic system preference detection.
+  * Styled with GitHub Primer design tokens, borders, badges, cards, buttons, and custom scrollbars.
+* **Google Sans Flex Typography:**
+  * Beautiful variable optical-sizing typography applied globally across all UI components, controls, tables, and tooltips.
   * Maps Country → Level 1 → Level 2 → Level 3 → Level 4 (Settlements/Points), while displaying country-specific official names (e.g. *County* in Kenya, *Region* in Tanzania, *District* in Uganda, *Province* in Rwanda and Burundi).
 * **Multi-Country & Regional Modes:**
   * Toggle between individual country views or **"All East Africa"** for unified cross-border comparison.
