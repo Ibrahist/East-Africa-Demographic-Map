@@ -1,0 +1,323 @@
+# East Africa Demographic Choropleth Map - Country Configuration
+# Phase 1: Kenya (KEN), Tanzania (TZA), Uganda (UGA), Rwanda (RWA), Burundi (BDI)
+# Extensible for Phase 2: South Sudan (SSD), DR Congo (COD), Somalia (SOM), Ethiopia (ETH)
+
+region:
+  name: "All East Africa"
+  code: "EAF"
+  center: { lat: -0.5, lng: 34.5 }
+  zoom: 5
+  bounds:
+    south: -11.75
+    west: 28.8
+    north: 5.5
+    east: 41.9
+  harmonized_level: 1
+  reference_notes: "When All East Africa is selected, indicators are shown from harmonized regional surveys (DHS Program 2016-2022 and national censuses 2019-2024). Reference years vary by country."
+
+countries:
+  KEN:
+    iso3: "KEN"
+    name: "Kenya"
+    official_name: "Republic of Kenya"
+    center: { lat: 0.5, lng: 37.5 }
+    zoom: 6
+    bounds: { south: -4.7, west: 33.9, north: 4.65, east: 41.9 }
+    census:
+      agency: "Kenya National Bureau of Statistics (KNBS)"
+      reference_year: 2019
+      previous_year: 2009
+      national_population: 47564296
+      source_name: "2019 Kenya Population and Housing Census (KPHC)"
+    dhs:
+      survey_id: "KE2022DHS"
+      survey_year: 2022
+      name: "Kenya Demographic and Health Survey 2022"
+    levels:
+      1:
+        name: "County"
+        name_plural: "Counties"
+        type: "polygon"
+        feature_count: 47
+        available: true
+        file: "data/processed/KEN/level1.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: null
+      2:
+        name: "Sub-County"
+        name_plural: "Sub-Counties"
+        type: "polygon"
+        feature_count: 290
+        available: true
+        file: "data/processed/KEN/level2.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      3:
+        name: "Ward"
+        name_plural: "Wards"
+        type: "polygon"
+        feature_count: 1452
+        available: true
+        file: "data/processed/KEN/level3.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      4:
+        name: "Sub-location / Village"
+        name_plural: "Sub-locations / Villages"
+        type: "point"
+        feature_count: 5000
+        available: true
+        is_point: true
+        file: "data/processed/KEN/level4_points.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+        notes: "Village-level features are point settlement locations from OpenStreetMap/KNBS; polygons are not published at village level."
+
+  TZA:
+    iso3: "TZA"
+    name: "Tanzania"
+    official_name: "United Republic of Tanzania"
+    center: { lat: -6.369, lng: 34.888 }
+    zoom: 6
+    bounds: { south: -11.75, west: 29.3, north: -0.98, east: 40.5 }
+    census:
+      agency: "National Bureau of Statistics (NBS)"
+      reference_year: 2022
+      previous_year: 2012
+      national_population: 61741120
+      source_name: "2022 Population and Housing Census (PHC)"
+    dhs:
+      survey_id: "TZ2022DHS"
+      survey_year: 2022
+      name: "Tanzania Demographic and Health Survey 2022"
+    levels:
+      1:
+        name: "Region"
+        name_plural: "Regions"
+        type: "polygon"
+        feature_count: 31
+        available: true
+        file: "data/processed/TZA/level1.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: null
+      2:
+        name: "District"
+        name_plural: "Districts"
+        type: "polygon"
+        feature_count: 170
+        available: true
+        file: "data/processed/TZA/level2.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      3:
+        name: "Ward"
+        name_plural: "Wards"
+        type: "polygon"
+        feature_count: 3644
+        available: true
+        file: "data/processed/TZA/level3.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      4:
+        name: "Village / Mtaa"
+        name_plural: "Villages / Mitaa"
+        type: "point"
+        feature_count: 10000
+        available: true
+        is_point: true
+        file: "data/processed/TZA/level4_points.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+        notes: "Village and Mtaa units are represented as point settlements from OpenStreetMap and NBS gazetteers."
+
+  UGA:
+    iso3: "UGA"
+    name: "Uganda"
+    official_name: "Republic of Uganda"
+    center: { lat: 1.373, lng: 32.290 }
+    zoom: 7
+    bounds: { south: -1.48, west: 29.57, north: 4.23, east: 35.0 }
+    census:
+      agency: "Uganda Bureau of Statistics (UBOS)"
+      reference_year: 2024
+      previous_year: 2014
+      national_population: 45905417
+      source_name: "National Population and Housing Census 2024"
+    dhs:
+      survey_id: "UG2016DHS"
+      survey_year: 2016
+      name: "Uganda Demographic and Health Survey 2016"
+    levels:
+      1:
+        name: "District"
+        name_plural: "Districts"
+        type: "polygon"
+        feature_count: 137
+        available: true
+        file: "data/processed/UGA/level1.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: null
+        notes: "Districts are the primary local government authority (LC5). Statistical regions (4) are statistical groupings."
+      2:
+        name: "County / Constituency"
+        name_plural: "Counties / Constituencies"
+        type: "polygon"
+        feature_count: 151
+        available: true
+        file: "data/processed/UGA/level2.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      3:
+        name: "Sub-county / Division"
+        name_plural: "Sub-counties / Divisions"
+        type: "polygon"
+        feature_count: 1521
+        available: true
+        file: "data/processed/UGA/level3.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      4:
+        name: "Parish / Village"
+        name_plural: "Parishes / Villages"
+        type: "point"
+        feature_count: 8000
+        available: true
+        is_point: true
+        file: "data/processed/UGA/level4_points.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+        notes: "Parish and village features are represented as point settlements from OpenStreetMap and UBOS."
+
+  RWA:
+    iso3: "RWA"
+    name: "Rwanda"
+    official_name: "Republic of Rwanda"
+    center: { lat: -1.94, lng: 29.87 }
+    zoom: 8
+    bounds: { south: -2.84, west: 28.86, north: -1.05, east: 30.9 }
+    census:
+      agency: "National Institute of Statistics of Rwanda (NISR)"
+      reference_year: 2022
+      previous_year: 2012
+      national_population: 13246394
+      source_name: "Fifth Rwanda Population and Housing Census (RPHC5 2022)"
+    dhs:
+      survey_id: "RW2019DHS"
+      survey_year: 2020
+      name: "Rwanda Demographic and Health Survey 2019-20"
+    levels:
+      1:
+        name: "Province (Intara)"
+        name_plural: "Provinces"
+        type: "polygon"
+        feature_count: 5
+        available: true
+        file: "data/processed/RWA/level1.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: null
+      2:
+        name: "District (Akarere)"
+        name_plural: "Districts"
+        type: "polygon"
+        feature_count: 30
+        available: true
+        file: "data/processed/RWA/level2.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      3:
+        name: "Sector (Umurenge)"
+        name_plural: "Sectors"
+        type: "polygon"
+        feature_count: 416
+        available: true
+        file: "data/processed/RWA/level3.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      4:
+        name: "Cell (Akagari)"
+        name_plural: "Cells"
+        type: "polygon"
+        feature_count: 2148
+        available: true
+        file: "data/processed/RWA/level4.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+        notes: "Rwanda has full polygon coverage down to Cell (Level 4, Akagari). Level 5 Umudugudu are village points."
+
+  BDI:
+    iso3: "BDI"
+    name: "Burundi"
+    official_name: "Republic of Burundi"
+    center: { lat: -3.37, lng: 29.91 }
+    zoom: 8
+    bounds: { south: -4.47, west: 29.0, north: -2.3, east: 30.85 }
+    census:
+      agency: "Institut de Statistiques et d'Études Économiques du Burundi (ISTEEBU)"
+      reference_year: 2022
+      previous_year: 2008
+      national_population: 12837740
+      source_name: "Projections Démographiques ISTEEBU (RGPH-2 Baseline)"
+    dhs:
+      survey_id: "BU2016DHS"
+      survey_year: 2016
+      name: "Enquête Démographique et de Santé du Burundi 2016-17"
+    levels:
+      1:
+        name: "Province"
+        name_plural: "Provinces"
+        type: "polygon"
+        feature_count: 18
+        available: true
+        file: "data/processed/BDI/level1.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: null
+        notes: "Historical 18 provinces matching ISTEEBU census baseline and DHS. Burundi enacted a 5-province reform in 2023."
+      2:
+        name: "Commune"
+        name_plural: "Communes"
+        type: "polygon"
+        feature_count: 119
+        available: true
+        file: "data/processed/BDI/level2.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      3:
+        name: "Colline / Quartier"
+        name_plural: "Collines / Quartiers"
+        type: "polygon"
+        feature_count: 2615
+        available: true
+        file: "data/processed/BDI/level3.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+      4:
+        name: "Village / Sous-colline"
+        name_plural: "Villages / Sous-collines"
+        type: "point"
+        feature_count: 2000
+        available: true
+        is_point: true
+        file: "data/processed/BDI/level4_points.geojson"
+        id_field: "id"
+        name_field: "name"
+        parent_id_field: "parent_id"
+        notes: "Collines are mapped at Level 3. Level 4 represents point settlements from OpenStreetMap."
