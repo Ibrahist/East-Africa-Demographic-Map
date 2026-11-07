@@ -1,7 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..1000&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  --font-sans: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --color-slate-50: #f6f8fa;
   --color-slate-100: #eaeef2;
   --color-slate-200: #d0d7de;
@@ -57,14 +58,20 @@
   --gh-danger-fg: #f85149;
 }
 
+*, ::before, ::after, input, button, select, textarea {
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-sans);
+  font-family: 'Google Sans Flex', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  font-optical-sizing: auto;
   background-color: var(--background);
   color: var(--foreground);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* GitHub style scrollbars */

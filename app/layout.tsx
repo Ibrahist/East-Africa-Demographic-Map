@@ -14,10 +14,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Google+Sans+Flex:wght@100..1000&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="antialiased min-h-screen flex flex-col bg-white dark:bg-[#0d1117] text-[#1f2328] dark:text-[#f0f6fc]">
         {children}
       </body>
     </html>
   );
 }
-
