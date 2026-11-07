@@ -29,6 +29,50 @@ export default function HomePage() {
   const [scaleMode, setScaleMode] = useState<"shared" | "per-country">("shared");
   const [opacity, setOpacity] = useState<number>(0.75);
   const [baseMapStyle, setBaseMapStyle] = useState<"light" | "dark" | "satellite">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Sync GitHub theme with DOM & localStorage on mount
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const saved = localStorage.getItem("gh-theme") as "light" | "dark" | null;
+    const preferred = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    setTheme(preferred);
+    if (preferred === "dark") {
+      document.documentElement.classList.add("dark");
+      setBaseMapStyle("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      setBaseMapStyle("light");
+    }
+  }, []);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === "dark" ? "light" : "dark";
+      localStorage.setItem("gh-theme", next);
+      if (next === "dark") {
+        document.documentElement.classList.add("dark");
+        setBaseMapStyle("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+        setBaseMapStyle("light");
+      }
+      return next;
+    });
+  };
+
+  const handleChangeBaseMap = (style: "light" | "dark" | "satellite") => {
+    setBaseMapStyle(style);
+    if (style === "dark") {
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("gh-theme", "dark");
+    } else if (style === "light") {
+      setTheme("light");
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("gh-theme", "light");
+    }
+  };
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isExportingPNG, setIsExportingPNG] = useState(false);
@@ -195,6 +239,9 @@ export default function HomePage() {
     if (currentCountry && currentCountry.levels[nextLevel]?.available) {
       setSelectedLevel(nextLevel);
       setParentFilterId(properties.id);
+      if (nextLevel > 1 && selectedIndicator.category === "health_wellbeing") {
+        setSelectedIndicatorId("total_population");
+      }
       setBreadcrumbs((prev) => [
         ...prev,
         {
@@ -235,6 +282,9 @@ export default function HomePage() {
     setParentFilterId(null);
     if (iso === "EAF") {
       setBreadcrumbs([{ id: "EAF", name: "All East Africa", level: 0 }]);
+      if (!INDICATORS[selectedIndicatorId]?.comparable_east_africa) {
+        setSelectedIndicatorId("total_population");
+      }
     } else {
       setBreadcrumbs([
         { id: "EAF", name: "All East Africa", level: 0 },
@@ -374,14 +424,16 @@ export default function HomePage() {
     selectedCountry === "EAF" ? "All East Africa" : COUNTRIES[selectedCountry]?.name || selectedCountry;
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-slate-50 dark:bg-slate-950">
-      {/* Top Application Bar */}
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-white dark:bg-[#0d1117] text-[#1f2328] dark:text-[#f0f6fc]">
+      {/* Top Application Bar (GitHub Header) */}
       <Header
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
         apiKey={apiKey}
         onUpdateApiKey={setApiKey}
         onSelectSearchResult={handleSelectSearchResult}
         allFeaturesIndex={allFeaturesIndex}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Workspace Layout */}
@@ -394,6 +446,9 @@ export default function HomePage() {
           onSelectLevel={(lvl) => {
             setSelectedLevel(lvl);
             setParentFilterId(null);
+            if (lvl > 1 && INDICATORS[selectedIndicatorId]?.category === "health_wellbeing") {
+              setSelectedIndicatorId("total_population");
+            }
           }}
           selectedIndicatorId={selectedIndicatorId}
           onSelectIndicator={setSelectedIndicatorId}
@@ -406,7 +461,7 @@ export default function HomePage() {
           opacity={opacity}
           onChangeOpacity={setOpacity}
           baseMapStyle={baseMapStyle}
-          onChangeBaseMap={setBaseMapStyle}
+          onChangeBaseMap={handleChangeBaseMap}
           onExportCSV={handleExportCSV}
           onExportPNG={handleExportPNG}
           isExportingPNG={isExportingPNG}

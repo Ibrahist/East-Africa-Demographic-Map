@@ -12,7 +12,9 @@ import {
   AlertTriangle,
   Sun,
   Moon,
-  Compass
+  Compass,
+  FileSpreadsheet,
+  Image as ImageIcon
 } from "lucide-react";
 import {
   CountryConfig,
@@ -72,7 +74,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const currentCountryConfig = COUNTRIES[selectedCountry];
   const isAllEastAfrica = selectedCountry === "EAF";
 
-  // Compute country-specific label for the level selector
+  // Country-specific label for the level selector
   const getLevelLabel = (level: number) => {
     if (isAllEastAfrica) {
       if (level === 1) return "Level 1 = County (KEN), Region (TZA), District (UGA), Province (RWA/BDI)";
@@ -82,7 +84,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (!lvlConfig || !lvlConfig.available) {
       return "Not available in this country";
     }
-    return `Level ${level} = ${lvlConfig.name} (${lvlConfig.type === "point" ? "Points" : "Polygons"})`;
+    return `Level ${level} = ${lvlConfig.name} (${lvlConfig.type === "point" ? "Settlement Points" : "Polygons"})`;
   };
 
   const isLevelAvailable = (level: number) => {
@@ -92,50 +94,54 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <aside
-      className={`fixed lg:static top-0 left-0 h-full w-80 sm:w-96 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-r border-slate-200 dark:border-slate-800 shadow-2xl z-30 transition-transform duration-300 ease-in-out flex flex-col ${
+      className={`fixed lg:static top-0 left-0 h-full w-80 sm:w-96 bg-white dark:bg-[#161b22] border-r border-[#d0d7de] dark:border-[#30363d] shadow-xl z-30 transition-transform duration-200 ease-in-out flex flex-col ${
         isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
       }`}
     >
-      {/* Header */}
-      <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-sky-600 to-indigo-600 flex items-center justify-center text-white shadow-md">
-            <Globe className="w-4 h-4" />
+      {/* Sidebar Header */}
+      <div className="p-3.5 border-b border-[#d0d7de] dark:border-[#30363d] flex items-center justify-between bg-[#f6f8fa] dark:bg-[#0d1117]">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-md bg-[#0969da] dark:bg-[#1f6feb] flex items-center justify-center text-white shadow-xs">
+            <Compass className="w-4 h-4" />
           </div>
           <div>
-            <h1 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
-              East Africa GIS
+            <h1 className="text-xs font-bold text-[#1f2328] dark:text-[#f0f6fc] leading-tight">
+              Administrative Explorer
             </h1>
-            <p className="text-[10px] text-slate-500 dark:text-slate-400">Demographic Choropleth Map</p>
+            <p className="text-[10px] text-[#656d76] dark:text-[#8b949e]">Demographics & Choropleth</p>
           </div>
         </div>
         <button
           onClick={onToggleOpen}
-          className="lg:hidden text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1"
+          className="lg:hidden text-[#656d76] dark:text-[#8b949e] hover:text-[#1f2328] dark:hover:text-white p-1 rounded-md"
         >
           ✕
         </button>
       </div>
 
-      {/* Scrollable Control Panels */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+      {/* Scrollable Controls */}
+      <div className="flex-1 overflow-y-auto p-3.5 space-y-4 text-xs">
         {/* 1. Country Selection */}
         <div>
-          <label className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 mb-2 uppercase tracking-wider text-[11px]">
-            <Compass className="w-3.5 h-3.5 text-sky-500" />
-            Country
-          </label>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="font-semibold text-[#1f2328] dark:text-[#f0f6fc] text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+              <Globe className="w-3.5 h-3.5 text-[#0969da] dark:text-[#2f81f7]" />
+              Territory / Scope
+            </label>
+            <span className="text-[10px] text-[#656d76] dark:text-[#8b949e]">Phase 1</span>
+          </div>
+
           <div className="grid grid-cols-2 gap-1.5">
             <button
               onClick={() => onSelectCountry("EAF")}
-              className={`col-span-2 py-2 px-3 rounded-lg text-left font-medium flex items-center justify-between border transition-all ${
+              className={`col-span-2 py-1.5 px-2.5 rounded-md text-left font-medium flex items-center justify-between border transition-all text-xs ${
                 isAllEastAfrica
-                  ? "bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400 font-bold"
-                  : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  ? "bg-[#ddf4ff] dark:bg-[#388bfd1a] border-[#0969da] dark:border-[#2f81f7] text-[#0969da] dark:text-[#2f81f7] font-bold"
+                  : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9] hover:bg-[#f6f8fa] dark:hover:bg-[#30363d]"
               }`}
             >
               <span>🌍 All East Africa (Harmonized)</span>
-              <span className="text-[10px] bg-sky-100 dark:bg-sky-950 text-sky-600 dark:text-sky-300 px-1.5 py-0.5 rounded">
+              <span className="text-[9px] bg-[#0969da]/10 dark:bg-[#2f81f7]/20 text-[#0969da] dark:text-[#2f81f7] px-1.5 py-0.5 rounded font-mono">
                 5 Countries
               </span>
             </button>
@@ -146,14 +152,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={c.iso3}
                   onClick={() => onSelectCountry(c.iso3)}
-                  className={`py-1.5 px-2.5 rounded-lg text-left border transition-all ${
+                  className={`py-1.5 px-2 rounded-md text-left border transition-all text-xs ${
                     active
-                      ? "bg-sky-500/10 border-sky-500 text-sky-600 dark:text-sky-400 font-bold shadow-sm"
-                      : "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                      ? "bg-[#ddf4ff] dark:bg-[#388bfd1a] border-[#0969da] dark:border-[#2f81f7] text-[#0969da] dark:text-[#2f81f7] font-bold shadow-xs"
+                      : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9] hover:bg-[#f6f8fa] dark:hover:bg-[#30363d]"
                   }`}
                 >
                   <div className="font-semibold">{c.name}</div>
-                  <div className="text-[9px] text-slate-400">{c.census.reference_year} Census</div>
+                  <div className="text-[9px] text-[#656d76] dark:text-[#8b949e]">{c.census.reference_year} Census</div>
                 </button>
               );
             })}
@@ -162,8 +168,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* 2. Administrative Hierarchy Level */}
         <div>
-          <label className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider text-[11px]">
-            <Layers className="w-3.5 h-3.5 text-indigo-500" />
+          <label className="font-semibold text-[#1f2328] dark:text-[#f0f6fc] text-[11px] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+            <Layers className="w-3.5 h-3.5 text-[#8250df] dark:text-[#a371f7]" />
             Administrative Level
           </label>
           <div className="grid grid-cols-4 gap-1.5 mb-1.5">
@@ -175,47 +181,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   key={lvl}
                   onClick={() => available && onSelectLevel(lvl)}
                   disabled={!available}
-                  className={`py-2 px-1 rounded-lg text-center font-bold border transition-all ${
+                  className={`py-1.5 px-1 rounded-md text-center font-bold border transition-all ${
                     active
-                      ? "bg-indigo-600 text-white border-indigo-600 shadow-md"
+                      ? "bg-[#0969da] dark:bg-[#1f6feb] text-white border-[#0969da] dark:border-[#1f6feb] shadow-xs"
                       : available
-                      ? "bg-slate-50 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800"
-                      : "bg-slate-100 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50"
+                      ? "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9] hover:bg-[#f6f8fa] dark:hover:bg-[#30363d]"
+                      : "bg-[#f6f8fa] dark:bg-[#161b22] border-[#d0d7de]/50 dark:border-[#30363d]/50 text-[#8c959f] dark:text-[#484f58] cursor-not-allowed opacity-60"
                   }`}
                 >
-                  <div>L{lvl}</div>
+                  <div className="text-xs">L{lvl}</div>
                   <div className="text-[9px] font-normal">Level {lvl}</div>
                 </button>
               );
             })}
           </div>
-          <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
+          <div className="text-[11px] text-[#656d76] dark:text-[#8b949e] bg-[#f6f8fa] dark:bg-[#0d1117] p-2 rounded-md border border-[#d0d7de] dark:border-[#30363d] leading-relaxed">
             {getLevelLabel(selectedLevel)}
           </div>
         </div>
 
         {/* 3. Demographic Indicator Selector */}
         <div>
-          <label className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 mb-1.5 uppercase tracking-wider text-[11px]">
-            <BarChart3 className="w-3.5 h-3.5 text-emerald-500" />
+          <label className="font-semibold text-[#1f2328] dark:text-[#f0f6fc] text-[11px] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+            <BarChart3 className="w-3.5 h-3.5 text-[#1a7f37] dark:text-[#3fb950]" />
             Demographic Indicator
           </label>
 
           {isAllEastAfrica && (
-            <div className="flex items-start gap-1.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 p-2 rounded-lg text-[10px] text-amber-800 dark:text-amber-300 mb-2.5">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0 text-amber-500 mt-0.5" />
+            <div className="flex items-start gap-1.5 bg-[#fff8c5] dark:bg-[#bb800926] border border-[#d4a72c] dark:border-[#9e6a03] p-2 rounded-md text-[10px] text-[#9a6700] dark:text-[#d29922] mb-2">
+              <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
               <span>
-                <strong>Cross-Country Mode:</strong> Showing harmonized indicators. Reference years vary (KEN 2019, TZA 2022, UGA 2024, RWA 2022, BDI 2022).
+                <strong>Cross-Country Harmonization:</strong> Showing comparable metrics. Reference years: KEN (2019), TZA (2022), UGA (2024), RWA (2022), BDI (2022).
               </span>
             </div>
           )}
 
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {CATEGORIES.map((cat) => {
               const catIndicators = Object.values(INDICATORS).filter((ind) => ind.category === cat.id);
               return (
                 <div key={cat.id}>
-                  <div className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-1">
+                  <div className="text-[10px] font-bold text-[#656d76] dark:text-[#8b949e] uppercase tracking-wider mb-1">
                     {cat.label}
                   </div>
                   <div className="space-y-1">
@@ -230,17 +236,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           key={ind.id}
                           onClick={() => !isDisabled && onSelectIndicator(ind.id)}
                           disabled={isDisabled}
-                          className={`w-full text-left py-1.5 px-2.5 rounded-lg border flex items-center justify-between transition-all ${
+                          className={`w-full text-left py-1.5 px-2 rounded-md border flex items-center justify-between transition-all text-xs ${
                             isSelected
-                              ? "bg-emerald-500/10 border-emerald-500 text-emerald-700 dark:text-emerald-400 font-bold"
+                              ? "bg-[#dafbe1] dark:bg-[#2ea04326] border-[#4ac26b] dark:border-[#238636] text-[#1a7f37] dark:text-[#3fb950] font-bold"
                               : isDisabled
-                              ? "bg-slate-50/50 dark:bg-slate-900/30 border-transparent text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50"
-                              : "bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
+                              ? "bg-transparent border-transparent text-[#8c959f] dark:text-[#484f58] cursor-not-allowed opacity-50"
+                              : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9] hover:bg-[#f6f8fa] dark:hover:bg-[#30363d]"
                           }`}
                         >
                           <span className="truncate">{ind.label}</span>
                           {isDisabled && (
-                            <span className="text-[9px] text-slate-400 ml-1 flex-shrink-0">
+                            <span className="text-[9px] text-[#8c959f] dark:text-[#484f58] ml-1 flex-shrink-0">
                               {disabledAtLevel ? "L1 only" : "Country only"}
                             </span>
                           )}
@@ -255,15 +261,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* 4. Color Scale & Map Controls */}
-        <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-3">
-          <label className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px]">
-            <Palette className="w-3.5 h-3.5 text-purple-500" />
-            Color & Classification
+        <div className="pt-2.5 border-t border-[#d0d7de] dark:border-[#30363d] space-y-2.5">
+          <label className="font-semibold text-[#1f2328] dark:text-[#f0f6fc] text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+            <Palette className="w-3.5 h-3.5 text-[#bf3989] dark:text-[#d2a8ff]" />
+            Choropleth Styling
           </label>
 
           {/* Classification Method */}
           <div>
-            <div className="text-[10px] text-slate-500 mb-1">Classification Method</div>
+            <div className="text-[10px] text-[#656d76] dark:text-[#8b949e] mb-1">Classification Method</div>
             <div className="grid grid-cols-3 gap-1">
               {[
                 { id: "quantile", label: "Quantile" },
@@ -273,10 +279,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={m.id}
                   onClick={() => onChangeClassification(m.id as ClassificationMethod)}
-                  className={`py-1 px-1.5 rounded text-[10px] font-medium border text-center transition-all ${
+                  className={`py-1 px-1 rounded-md text-[10px] font-medium border text-center transition-all ${
                     classificationMethod === m.id
-                      ? "bg-purple-600 text-white border-purple-600 font-bold"
-                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                      ? "bg-[#0969da] dark:bg-[#1f6feb] text-white border-[#0969da] dark:border-[#1f6feb] font-semibold"
+                      : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9] hover:bg-[#f6f8fa]"
                   }`}
                 >
                   {m.label}
@@ -287,11 +293,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Color Palette */}
           <div>
-            <div className="text-[10px] text-slate-500 mb-1">Color Palette (Color-Blind Safe)</div>
+            <div className="text-[10px] text-[#656d76] dark:text-[#8b949e] mb-1">Palette (Color-Blind Safe)</div>
             <select
               value={selectedPalette}
               onChange={(e) => onChangePalette(e.target.value)}
-              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-2 text-xs text-slate-800 dark:text-slate-200 font-medium"
+              className="gh-input w-full text-xs"
             >
               {Object.entries(COLOR_PALETTES).map(([key, p]) => (
                 <option key={key} value={key}>
@@ -304,24 +310,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
           {/* Scale Mode (When All East Africa) */}
           {isAllEastAfrica && (
             <div>
-              <div className="text-[10px] text-slate-500 mb-1">Scale Mode</div>
+              <div className="text-[10px] text-[#656d76] dark:text-[#8b949e] mb-1">Scale Mode</div>
               <div className="grid grid-cols-2 gap-1">
                 <button
                   onClick={() => onChangeScaleMode("shared")}
-                  className={`py-1 px-2 rounded text-[10px] font-medium border text-center ${
+                  className={`py-1 px-1.5 rounded-md text-[10px] font-medium border text-center ${
                     scaleMode === "shared"
-                      ? "bg-purple-600 text-white border-purple-600"
-                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                      ? "bg-[#0969da] dark:bg-[#1f6feb] text-white border-[#0969da] dark:border-[#1f6feb] font-semibold"
+                      : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9]"
                   }`}
                 >
-                  Shared Regional Scale
+                  Shared Scale
                 </button>
                 <button
                   onClick={() => onChangeScaleMode("per-country")}
-                  className={`py-1 px-2 rounded text-[10px] font-medium border text-center ${
+                  className={`py-1 px-1.5 rounded-md text-[10px] font-medium border text-center ${
                     scaleMode === "per-country"
-                      ? "bg-purple-600 text-white border-purple-600"
-                      : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                      ? "bg-[#0969da] dark:bg-[#1f6feb] text-white border-[#0969da] dark:border-[#1f6feb] font-semibold"
+                      : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#1f2328] dark:text-[#c9d1d9]"
                   }`}
                 >
                   Per-Country Scale
@@ -332,9 +338,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
           {/* Opacity Slider */}
           <div>
-            <div className="flex justify-between text-[10px] text-slate-500 mb-1">
+            <div className="flex justify-between text-[10px] text-[#656d76] dark:text-[#8b949e] mb-1">
               <span>Choropleth Opacity</span>
-              <span>{Math.round(opacity * 100)}%</span>
+              <span className="font-mono">{Math.round(opacity * 100)}%</span>
             </div>
             <input
               type="range"
@@ -343,17 +349,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
               step="0.05"
               value={opacity}
               onChange={(e) => onChangeOpacity(parseFloat(e.target.value))}
-              className="w-full accent-purple-600"
+              className="w-full accent-[#0969da] dark:accent-[#2f81f7]"
             />
           </div>
 
           {/* Base Map Style */}
           <div>
-            <div className="text-[10px] text-slate-500 mb-1">Base Map Canvas</div>
+            <div className="text-[10px] text-[#656d76] dark:text-[#8b949e] mb-1">Base Map Canvas</div>
             <div className="grid grid-cols-3 gap-1">
               {[
-                { id: "light", label: "Light", icon: Sun },
-                { id: "dark", label: "Dark", icon: Moon },
+                { id: "light", label: "GitHub Light", icon: Sun },
+                { id: "dark", label: "GitHub Dark", icon: Moon },
                 { id: "satellite", label: "Satellite", icon: Globe }
               ].map((b) => {
                 const Icon = b.icon;
@@ -361,10 +367,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={b.id}
                     onClick={() => onChangeBaseMap(b.id as any)}
-                    className={`py-1 px-1.5 rounded text-[10px] font-medium border flex items-center justify-center gap-1 ${
+                    className={`py-1 px-1 rounded-md text-[10px] font-medium border flex items-center justify-center gap-1 transition-all ${
                       baseMapStyle === b.id
-                        ? "bg-slate-900 text-white dark:bg-white dark:text-slate-900 border-transparent font-bold"
-                        : "bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300"
+                        ? "bg-[#1f2328] text-white dark:bg-[#f0f6fc] dark:text-[#1f2328] border-transparent font-bold"
+                        : "bg-white dark:bg-[#21262d] border-[#d0d7de] dark:border-[#30363d] text-[#656d76] dark:text-[#8b949e] hover:bg-[#f6f8fa]"
                     }`}
                   >
                     <Icon className="w-3 h-3" />
@@ -377,24 +383,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* 5. Export Actions */}
-        <div className="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
-          <label className="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider text-[11px]">
-            <Download className="w-3.5 h-3.5 text-blue-500" />
-            Export & Download
+        <div className="pt-2.5 border-t border-[#d0d7de] dark:border-[#30363d] space-y-2">
+          <label className="font-semibold text-[#1f2328] dark:text-[#f0f6fc] text-[11px] uppercase tracking-wider flex items-center gap-1.5">
+            <Download className="w-3.5 h-3.5 text-[#0969da] dark:text-[#2f81f7]" />
+            Export & Data Downloads
           </label>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={onExportCSV}
-              className="py-2 px-3 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 font-semibold text-slate-800 dark:text-slate-200 text-center transition-colors border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-1.5"
+              className="gh-btn py-1.5 px-2 text-xs font-semibold flex items-center justify-center gap-1.5"
             >
-              <span>Download CSV</span>
+              <FileSpreadsheet className="w-3.5 h-3.5 text-[#1a7f37] dark:text-[#3fb950]" />
+              <span>Export CSV</span>
             </button>
             <button
               onClick={onExportPNG}
               disabled={isExportingPNG}
-              className="py-2 px-3 rounded-lg bg-sky-600 hover:bg-sky-700 text-white font-semibold text-center transition-colors shadow-sm flex items-center justify-center gap-1.5 disabled:opacity-50"
+              className="gh-btn gh-btn-primary py-1.5 px-2 text-xs flex items-center justify-center gap-1.5 disabled:opacity-50"
             >
-              <span>{isExportingPNG ? "Generating..." : "Export Map PNG"}</span>
+              <ImageIcon className="w-3.5 h-3.5" />
+              <span>{isExportingPNG ? "Rendering..." : "Export PNG"}</span>
             </button>
           </div>
         </div>
@@ -402,4 +410,3 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </aside>
   );
 };
-

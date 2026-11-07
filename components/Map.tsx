@@ -23,24 +23,24 @@ interface MapProps {
 }
 
 const LIGHT_MAP_STYLE: google.maps.MapTypeStyle[] = [
-  { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#475569" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#cbd5e1" }] },
-  { featureType: "administrative.country", elementType: "geometry.stroke", stylers: [{ color: "#0f172a" }, { weight: 1.8 }] },
-  { featureType: "administrative.province", elementType: "geometry.stroke", stylers: [{ color: "#94a3b8" }, { weight: 0.8 }] },
-  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f8fafc" }] },
+  { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#24292f" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#ddf4ff" }] },
+  { featureType: "administrative.country", elementType: "geometry.stroke", stylers: [{ color: "#0969da" }, { weight: 1.8 }] },
+  { featureType: "administrative.province", elementType: "geometry.stroke", stylers: [{ color: "#d0d7de" }, { weight: 1 }] },
+  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#f6f8fa" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] }
 ];
 
 const DARK_MAP_STYLE: google.maps.MapTypeStyle[] = [
-  { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#94a3b8" }] },
+  { featureType: "all", elementType: "labels.text.fill", stylers: [{ color: "#e6edf3" }] },
   { featureType: "all", elementType: "labels.text.stroke", stylers: [{ visibility: "off" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0f172a" }] },
-  { featureType: "administrative.country", elementType: "geometry.stroke", stylers: [{ color: "#38bdf8" }, { weight: 1.5 }] },
-  { featureType: "administrative.province", elementType: "geometry.stroke", stylers: [{ color: "#334155" }, { weight: 0.8 }] },
-  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#1e293b" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#040d21" }] },
+  { featureType: "administrative.country", elementType: "geometry.stroke", stylers: [{ color: "#2f81f7" }, { weight: 1.8 }] },
+  { featureType: "administrative.province", elementType: "geometry.stroke", stylers: [{ color: "#30363d" }, { weight: 1 }] },
+  { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#0d1117" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e293b" }] }
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#161b22" }] }
 ];
 
 interface SvgPathItem {
@@ -213,7 +213,13 @@ export const MapView: React.FC<MapProps> = ({
       return {
         fillColor,
         fillOpacity: opacity,
-        strokeColor: isHovered ? "#0284c7" : baseMapStyle === "dark" ? "#475569" : "#64748b",
+        strokeColor: isHovered
+          ? baseMapStyle === "dark"
+            ? "#2f81f7"
+            : "#0969da"
+          : baseMapStyle === "dark"
+          ? "#30363d"
+          : "#d0d7de",
         strokeWeight: isHovered ? 2.5 : 0.8,
         zIndex: isHovered ? 100 : 1,
       };
@@ -369,7 +375,7 @@ export const MapView: React.FC<MapProps> = ({
       {!useGoogleMaps && (
         <div
           className={`w-full h-full relative cursor-grab active:cursor-grabbing ${
-            baseMapStyle === "dark" ? "bg-slate-950" : "bg-slate-100"
+            baseMapStyle === "dark" ? "bg-[#0d1117]" : "bg-[#f6f8fa]"
           }`}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -377,10 +383,15 @@ export const MapView: React.FC<MapProps> = ({
           onWheel={handleWheel}
         >
           {/* Subtle Grid Pattern for cartographic aesthetic */}
-          <svg className="absolute inset-0 w-full h-full opacity-15 pointer-events-none">
+          <svg className="absolute inset-0 w-full h-full opacity-20 pointer-events-none">
             <defs>
               <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" />
+                <path
+                  d="M 40 0 L 0 0 0 40"
+                  fill="none"
+                  stroke={baseMapStyle === "dark" ? "#30363d" : "#d0d7de"}
+                  strokeWidth="0.5"
+                />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#grid)" />
@@ -405,7 +416,15 @@ export const MapView: React.FC<MapProps> = ({
                   d={item.pathData}
                   fill={item.color}
                   fillOpacity={opacity}
-                  stroke={isHovered ? "#0284c7" : baseMapStyle === "dark" ? "#334155" : "#64748b"}
+                  stroke={
+                    isHovered
+                      ? baseMapStyle === "dark"
+                        ? "#2f81f7"
+                        : "#0969da"
+                      : baseMapStyle === "dark"
+                      ? "#30363d"
+                      : "#d0d7de"
+                  }
                   strokeWidth={isHovered ? 2.5 / zoomLevel : 0.8 / zoomLevel}
                   className="transition-colors duration-150 cursor-pointer"
                   onMouseEnter={(e) => {
@@ -445,7 +464,7 @@ export const MapView: React.FC<MapProps> = ({
                   cx={cx}
                   cy={cy}
                   r={isHovered ? 6 / zoomLevel : 3.5 / zoomLevel}
-                  fill={isHovered ? "#f59e0b" : "#2563eb"}
+                  fill={isHovered ? "#d29922" : "#0969da"}
                   fillOpacity={0.9}
                   stroke="#ffffff"
                   strokeWidth={1 / zoomLevel}
@@ -466,58 +485,58 @@ export const MapView: React.FC<MapProps> = ({
           </svg>
 
           {/* On-screen Zoom & Pan Controls for Vector Mode */}
-          <div className="absolute top-16 right-4 flex flex-col gap-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md p-1.5 rounded-xl shadow-lg border border-slate-200 dark:border-slate-800 z-10">
+          <div className="absolute top-14 right-4 flex flex-col gap-1 bg-white/95 dark:bg-[#161b22]/95 backdrop-blur-md p-1 rounded-md shadow-md border border-[#d0d7de] dark:border-[#30363d] z-10">
             <button
               onClick={() => setZoomLevel((z) => Math.min(8, z * 1.25))}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+              className="p-1.5 rounded-md hover:bg-[#f6f8fa] dark:hover:bg-[#21262d] text-[#1f2328] dark:text-[#f0f6fc] transition-colors"
               title="Zoom In"
             >
-              <ZoomIn className="w-4 h-4" />
+              <ZoomIn className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => setZoomLevel((z) => Math.max(0.6, z * 0.8))}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+              className="p-1.5 rounded-md hover:bg-[#f6f8fa] dark:hover:bg-[#21262d] text-[#1f2328] dark:text-[#f0f6fc] transition-colors"
               title="Zoom Out"
             >
-              <ZoomOut className="w-4 h-4" />
+              <ZoomOut className="w-3.5 h-3.5" />
             </button>
             <button
               onClick={() => {
                 setZoomLevel(1);
                 setPanOffset({ x: 0, y: 0 });
               }}
-              className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200"
+              className="p-1.5 rounded-md hover:bg-[#f6f8fa] dark:hover:bg-[#21262d] text-[#1f2328] dark:text-[#f0f6fc] transition-colors"
               title="Reset View"
             >
-              <RotateCcw className="w-4 h-4" />
+              <RotateCcw className="w-3.5 h-3.5" />
             </button>
           </div>
         </div>
       )}
 
       {/* Top Status Notification Banner */}
-      <div className="absolute top-3 right-16 z-10 hidden sm:flex items-center gap-2">
+      <div className="absolute top-3 right-14 z-10 hidden sm:flex items-center gap-2">
         {scriptError ? (
-          <div className="flex items-center gap-1.5 bg-red-500/10 dark:bg-red-950/40 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-red-300 dark:border-red-800 text-xs text-red-700 dark:text-red-300">
-            <Info className="w-3.5 h-3.5 text-red-500 flex-shrink-0" />
+          <div className="flex items-center gap-1.5 bg-[#ffebe9] dark:bg-[#f8514926] px-2.5 py-1 rounded-md shadow-xs border border-[#ff8182] dark:border-[#da3633] text-xs text-[#cf222e] dark:text-[#f85149]">
+            <Info className="w-3.5 h-3.5 flex-shrink-0" />
             <span>{scriptError}</span>
           </div>
         ) : apiKey ? (
-          <div className="flex items-center gap-1.5 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-slate-200 dark:border-slate-800 text-xs">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="font-medium text-slate-700 dark:text-slate-300">
+          <div className="flex items-center gap-1.5 bg-white/95 dark:bg-[#161b22]/95 px-2.5 py-1 rounded-md shadow-xs border border-[#d0d7de] dark:border-[#30363d] text-xs">
+            <span className="w-2 h-2 rounded-full bg-[#1a7f37] dark:bg-[#3fb950] animate-pulse" />
+            <span className="font-medium text-[#1f2328] dark:text-[#f0f6fc]">
               {useGoogleMaps ? "Google Maps Engine" : "Vector Mode"}
             </span>
             <button
               onClick={() => setForceVectorMode((v) => !v)}
-              className="ml-1 text-[10px] text-sky-600 dark:text-sky-400 font-bold hover:underline"
+              className="ml-1 text-[10px] text-[#0969da] dark:text-[#2f81f7] font-bold hover:underline"
             >
               Switch to {useGoogleMaps ? "Vector" : "Google Maps"}
             </button>
           </div>
         ) : (
-          <div className="flex items-center gap-1.5 bg-amber-500/10 dark:bg-amber-950/40 backdrop-blur-md px-3 py-1.5 rounded-full shadow-sm border border-amber-300 dark:border-amber-800 text-xs text-amber-800 dark:text-amber-300">
-            <Info className="w-3.5 h-3.5 text-amber-500 flex-shrink-0" />
+          <div className="flex items-center gap-1.5 bg-[#fff8c5] dark:bg-[#bb800926] px-2.5 py-1 rounded-md shadow-xs border border-[#d4a72c] dark:border-[#9e6a03] text-xs text-[#9a6700] dark:text-[#d29922]">
+            <Info className="w-3.5 h-3.5 flex-shrink-0" />
             <span>Interactive Vector Mode (No API key required)</span>
           </div>
         )}

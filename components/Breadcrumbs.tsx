@@ -17,10 +17,10 @@ interface BreadcrumbsProps {
 
 export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, onSelect }) => {
   return (
-    <nav className="flex items-center space-x-1.5 text-xs text-slate-600 dark:text-slate-300 overflow-x-auto py-1 px-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
+    <nav className="flex items-center space-x-1.5 text-xs text-[#1f2328] dark:text-[#f0f6fc] overflow-x-auto py-1.5 px-3 bg-white/95 dark:bg-[#161b22]/95 backdrop-blur-md rounded-md shadow-xs border border-[#d0d7de] dark:border-[#30363d]">
       <button
         onClick={() => onSelect({ id: "EAF", name: "All East Africa", level: 0 })}
-        className="flex items-center gap-1 hover:text-sky-600 dark:hover:text-sky-400 font-medium transition-colors"
+        className="flex items-center gap-1 hover:text-[#0969da] dark:hover:text-[#2f81f7] font-medium transition-colors"
         title="Reset to All East Africa"
       >
         <Home className="w-3.5 h-3.5" />
@@ -31,14 +31,14 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, onSelect }) => 
         const isLast = idx === items.length - 1;
         return (
           <React.Fragment key={item.id + idx}>
-            <ChevronRight className="w-3 h-3 text-slate-400 flex-shrink-0" />
+            <ChevronRight className="w-3 h-3 text-[#656d76] dark:text-[#8b949e] flex-shrink-0" />
             <button
               onClick={() => onSelect(item)}
               disabled={isLast}
-              className={`truncate max-w-[140px] transition-colors ${
+              className={`truncate max-w-[150px] transition-colors ${
                 isLast
-                  ? "font-bold text-sky-600 dark:text-sky-400 cursor-default"
-                  : "hover:text-sky-600 dark:hover:text-sky-400 text-slate-600 dark:text-slate-400"
+                  ? "font-bold text-[#0969da] dark:text-[#2f81f7] cursor-default"
+                  : "hover:text-[#0969da] dark:hover:text-[#2f81f7] text-[#656d76] dark:text-[#8b949e]"
               }`}
               title={item.name}
             >
@@ -50,4 +50,3 @@ export const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, onSelect }) => 
     </nav>
   );
 };
-
