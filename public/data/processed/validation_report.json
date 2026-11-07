@@ -1,0 +1,52 @@
+{
+  "KEN": {
+    "sum_level1_population": 47562772,
+    "census_official": 47564296,
+    "reference_year": 2019,
+    "census_difference_pct": 0.0,
+    "worldpop_benchmark": 47800000,
+    "worldpop_difference_pct": 0.5,
+    "feature_count": 47,
+    "status": "PASSED"
+  },
+  "TZA": {
+    "sum_level1_population": 60216349,
+    "census_official": 61741120,
+    "reference_year": 2022,
+    "census_difference_pct": 2.47,
+    "worldpop_benchmark": 61500000,
+    "worldpop_difference_pct": 2.09,
+    "feature_count": 30,
+    "status": "PASSED"
+  },
+  "UGA": {
+    "sum_level1_population": 45926514,
+    "census_official": 45905417,
+    "reference_year": 2024,
+    "census_difference_pct": 0.05,
+    "worldpop_benchmark": 45800000,
+    "worldpop_difference_pct": 0.28,
+    "feature_count": 136,
+    "status": "PASSED"
+  },
+  "RWA": {
+    "sum_level1_population": 13173730,
+    "census_official": 13246394,
+    "reference_year": 2022,
+    "census_difference_pct": 0.55,
+    "worldpop_benchmark": 13300000,
+    "worldpop_difference_pct": 0.95,
+    "feature_count": 5,
+    "status": "PASSED"
+  },
+  "BDI": {
+    "sum_level1_population": 13462695,
+    "census_official": 13462695,
+    "reference_year": 2022,
+    "census_difference_pct": 0.0,
+    "worldpop_benchmark": 12800000,
+    "worldpop_difference_pct": 5.18,
+    "feature_count": 18,
+    "status": "PASSED"
+  }
+}
