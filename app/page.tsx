@@ -7,7 +7,7 @@ import { MapView } from "../components/Map";
 import { Tooltip } from "../components/Tooltip";
 import { Legend } from "../components/Legend";
 import { Breadcrumbs, BreadcrumbItem } from "../components/Breadcrumbs";
-import { PlaceDetailsModal } from "../components/PlaceDetailsModal";
+import { PlaceExportMenu } from "../components/PlaceExportMenu";
 import { COUNTRIES, REGION_CONFIG, INDICATORS } from "../lib/config";
 import { FeatureProperties, TooltipState } from "../lib/types";
 import {
@@ -29,7 +29,7 @@ export default function HomePage() {
   const [selectedPalette, setSelectedPalette] = useState<string>("Viridis");
   const [scaleMode, setScaleMode] = useState<"shared" | "per-country">("shared");
   const [opacity, setOpacity] = useState<number>(0.75);
-  const [baseMapStyle, setBaseMapStyle] = useState<"light" | "dark" | "satellite">("dark");
+  const [baseMapStyle, setBaseMapStyle] = useState<"light" | "dark" | "satellite">("satellite");
 
   // Ensure Dark Mode is permanently active on mount
   useEffect(() => {
@@ -491,6 +491,7 @@ export default function HomePage() {
             onFeatureClick={handleFeatureClick}
             onHoverFeature={handleHoverFeature}
             hoveredFeatureId={hoveredFeatureId}
+            selectedFeatureId={selectedPlaceFeature?.properties?.id}
             mapCenter={
               selectedCountry === "EAF"
                 ? REGION_CONFIG.center
@@ -525,9 +526,9 @@ export default function HomePage() {
             />
           </div>
 
-          {/* Place Full Details & Individual Export Modal */}
+          {/* Place Export Menu upon clicking an area */}
           {selectedPlaceFeature && (
-            <PlaceDetailsModal
+            <PlaceExportMenu
               feature={selectedPlaceFeature}
               indicator={selectedIndicator}
               countryName={

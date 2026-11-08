@@ -18,6 +18,7 @@ interface MapProps {
   onFeatureClick: (properties: FeatureProperties) => void;
   onHoverFeature: (state: TooltipState) => void;
   hoveredFeatureId: string | null;
+  selectedFeatureId?: string | null;
   mapCenter?: { lat: number; lng: number };
   mapZoom?: number;
 }
@@ -65,6 +66,7 @@ export const MapView: React.FC<MapProps> = ({
   onFeatureClick,
   onHoverFeature,
   hoveredFeatureId,
+  selectedFeatureId = null,
   mapCenter = { lat: -0.5, lng: 34.5 },
   mapZoom = 5,
 }) => {
@@ -191,7 +193,8 @@ export const MapView: React.FC<MapProps> = ({
     map.data.setStyle((feature: google.maps.Data.Feature): google.maps.Data.StyleOptions => {
       const val = feature.getProperty(selectedIndicator.id) as number | null | undefined;
       const isPoint = feature.getProperty("is_point") === true;
-      const isHovered = feature.getProperty("id") === hoveredFeatureId;
+      const isSelected = feature.getProperty("id") === selectedFeatureId;
+      const isHovered = feature.getProperty("id") === hoveredFeatureId || isSelected;
       const name = String(feature.getProperty("name") || "");
 
       const fillColor = getColorForValue(val, breaks, paletteKey);
@@ -200,11 +203,11 @@ export const MapView: React.FC<MapProps> = ({
         return {
           icon: {
             path: google.maps.SymbolPath.CIRCLE,
-            fillColor: isHovered ? "#f59e0b" : "#2563eb",
+            fillColor: isSelected ? "#38bdf8" : isHovered ? "#f59e0b" : "#2563eb",
             fillOpacity: 0.85,
-            scale: isHovered ? 7 : 4.5,
+            scale: isSelected ? 8 : isHovered ? 7 : 4.5,
             strokeColor: "#ffffff",
-            strokeWeight: 1.5,
+            strokeWeight: isSelected ? 2.5 : 1.5,
           },
           title: name,
         };
@@ -213,18 +216,20 @@ export const MapView: React.FC<MapProps> = ({
       return {
         fillColor,
         fillOpacity: opacity,
-        strokeColor: isHovered
-          ? baseMapStyle === "dark"
+        strokeColor: isSelected
+          ? "#38bdf8"
+          : isHovered
+          ? baseMapStyle === "dark" || baseMapStyle === "satellite"
             ? "#2f81f7"
             : "#0969da"
-          : baseMapStyle === "dark"
+          : baseMapStyle === "dark" || baseMapStyle === "satellite"
           ? "#30363d"
           : "#d0d7de",
-        strokeWeight: isHovered ? 2.5 : 0.8,
-        zIndex: isHovered ? 100 : 1,
+        strokeWeight: isSelected ? 3.5 : isHovered ? 2.5 : 0.8,
+        zIndex: isSelected ? 120 : isHovered ? 100 : 1,
       };
     });
-  }, [selectedIndicator, breaks, paletteKey, opacity, hoveredFeatureId, baseMapStyle, useGoogleMaps]);
+  }, [selectedIndicator, breaks, paletteKey, opacity, hoveredFeatureId, selectedFeatureId, baseMapStyle, useGoogleMaps]);
 
   // Google Maps Listeners
   useEffect(() => {
@@ -409,7 +414,8 @@ export const MapView: React.FC<MapProps> = ({
             {/* Polygons */}
             {svgPaths.map((item: SvgPathItem) => {
               if (item.isPoint) return null;
-              const isHovered = item.id === hoveredFeatureId;
+              const isSelected = item.id === selectedFeatureId;
+              const isHovered = item.id === hoveredFeatureId || isSelected;
               return (
                 <path
                   key={item.id}
@@ -417,15 +423,17 @@ export const MapView: React.FC<MapProps> = ({
                   fill={item.color}
                   fillOpacity={opacity}
                   stroke={
-                    isHovered
-                      ? baseMapStyle === "dark"
+                    isSelected
+                      ? "#38bdf8"
+                      : isHovered
+                      ? baseMapStyle === "dark" || baseMapStyle === "satellite"
                         ? "#2f81f7"
                         : "#0969da"
-                      : baseMapStyle === "dark"
+                      : baseMapStyle === "dark" || baseMapStyle === "satellite"
                       ? "#30363d"
                       : "#d0d7de"
                   }
-                  strokeWidth={isHovered ? 2.5 / zoomLevel : 0.8 / zoomLevel}
+                  strokeWidth={isSelected ? 3.5 / zoomLevel : isHovered ? 2.5 / zoomLevel : 0.8 / zoomLevel}
                   className="transition-colors duration-150 cursor-pointer"
                   onMouseEnter={(e) => {
                     onHoverFeature({
@@ -457,17 +465,18 @@ export const MapView: React.FC<MapProps> = ({
             {svgPaths.map((item: SvgPathItem) => {
               if (!item.isPoint || !item.pointPos) return null;
               const [cx, cy] = item.pointPos;
-              const isHovered = item.id === hoveredFeatureId;
+              const isSelected = item.id === selectedFeatureId;
+              const isHovered = item.id === hoveredFeatureId || isSelected;
               return (
                 <circle
                   key={item.id}
                   cx={cx}
                   cy={cy}
-                  r={isHovered ? 6 / zoomLevel : 3.5 / zoomLevel}
-                  fill={isHovered ? "#d29922" : "#0969da"}
+                  r={isSelected ? 7 / zoomLevel : isHovered ? 6 / zoomLevel : 3.5 / zoomLevel}
+                  fill={isSelected ? "#38bdf8" : isHovered ? "#d29922" : "#0969da"}
                   fillOpacity={0.9}
                   stroke="#ffffff"
-                  strokeWidth={1 / zoomLevel}
+                  strokeWidth={isSelected ? 2 / zoomLevel : 1 / zoomLevel}
                   className="cursor-pointer"
                   onMouseEnter={(e) => {
                     onHoverFeature({
