@@ -208,11 +208,107 @@ The automated pipeline tests census totals against official statistical publicat
 
 ---
 
-## 8. Data Licences & Attribution
+## 8. Data Sources, Acquisition & Open Data Policy
 
-* **Boundaries:** geoBoundaries (ODbL 1.0 / CC BY 4.0 / Public Domain), UN OCHA COD-AB (CC BY-IGO).
-* **Demographics:** KNBS Kenya, NBS Tanzania, UBOS Uganda, NISR Rwanda, ISTEEBU Burundi.
-* **Health & Wellbeing:** The DHS Program (USAID / ICF) REST API (`https://api.dhsprogram.com`).
-* **Settlements:** OpenStreetMap contributors via Humanitarian OpenStreetMap Team (ODbL 1.0).
-* Full source registry and download URLs available in [`/data/SOURCES.md`](file:///d:/East%20Africa%20Demographic%20Map/data/SOURCES.md).
+> [!IMPORTANT]
+> **Exclusive Use of Publicly Available Open Data**  
+> All spatial boundaries, census counts, health indicators, and settlement datasets utilized in this application and data pipeline were acquired **strictly and exclusively from publicly available, legally reusable open datasets**.  
+> * **No Login Gates or Paywalls:** No login-protected, paywalled, or terms-restricted websites were accessed or scraped.
+> * **API & Scraping Ethics:** Where programmatic fetching was performed, requests respected `robots.txt`, were non-invasive, rate-limited, and consumed documented public APIs or official public repository downloads.
+> * **Open Licensing:** All datasets carry open licenses (Creative Commons CC BY 4.0 / CC BY-IGO / CC0, Open Data Commons ODbL 1.0, or national Open Government Data licenses).
+
+---
+
+### A. Administrative Boundary Datasets (Spatial Vectors)
+
+| Country / Region | Level & Entity | Data Source / Agency | Platform / Access URL | License |
+| :--- | :--- | :--- | :--- | :--- |
+| **Regional / Global** | Levels 0, 1, 2, 3 | **geoBoundaries** (William & Mary GeoLab) & **UN OCHA COD-AB** | [geoBoundaries.org](https://www.geoboundaries.org) / [HDX](https://data.humdata.org) | CC BY 4.0 / CC BY 3.0 IGO / ODbL |
+| **Kenya (`KEN`)** | L1: County (47)<br>L2: Sub-County (290)<br>L3: Ward (1,452) | Kenya National Bureau of Statistics (KNBS) / Independent Electoral and Boundaries Commission (IEBC) via UN OCHA | [HDX Kenya COD-AB](https://data.humdata.org/dataset/ken-administrative-boundaries) | CC BY-IGO / Public Domain |
+| **Tanzania (`TZA`)** | L1: Region (31)<br>L2: District (170)<br>L3: Ward (3,644) | National Bureau of Statistics (NBS) Tanzania & OCGS Zanzibar via OCHA ROSA / geoBoundaries | [HDX Tanzania COD-AB](https://data.humdata.org/dataset/cod-ab-tza) | CC BY-IGO / ODbL 1.0 |
+| **Uganda (`UGA`)** | L1: District (136)<br>L2: County (151)<br>L3: Sub-County (1,521) | Uganda Bureau of Statistics (UBOS) / WHO / UN OCHA | [HDX Uganda COD-AB](https://data.humdata.org/dataset/cod-ab-uga) | CC BY 3.0 IGO / Public Domain |
+| **Rwanda (`RWA`)** | L1: Province (5)<br>L2: District (30)<br>L3: Sector (416)<br>L4: Cell (2,148) | National Institute of Statistics of Rwanda (NISR) / National Land Authority (NLA) | [NISR Open Data](https://www.statistics.gov.rw) / [geoBoundaries RWA](https://www.geoboundaries.org) | CC BY 4.0 / Open Data |
+| **Burundi (`BDI`)** | L1: Province (18)<br>L2: Commune (119)<br>L3: Colline (2,615) | Institut de Statistiques et d'Études Économiques du Burundi (ISTEEBU) / UN OCHA | [HDX Burundi COD-AB](https://data.humdata.org/dataset/cod-ab-bdi) | CC0 / Public Domain |
+| **All Countries** | Level 4 Settlements & Populated Places (Points) | **OpenStreetMap contributors** via Humanitarian OpenStreetMap Team (HOT) Export Tool | [HOT Export Tool](https://export.hotosm.org) / [OpenStreetMap](https://www.openstreetmap.org) | Open Data Commons ODbL 1.0 |
+
+---
+
+### B. Demographic & Population Census Sources
+
+1. **Kenya:**
+   * **Agency:** Kenya National Bureau of Statistics (KNBS)
+   * **Source Publication:** *2019 Kenya Population and Housing Census (KPHC 2019)*, Volume I: *Population by County and Sub-County*; Volume II: *Distribution of Population by Age and Sex*; Volume III: *Distribution of Population by Land Area and Population Density*.
+   * **Census Date:** 24th/25th August 2019 (Official National Population: 47,564,296).
+   * **Access:** [KNBS Census Portal](https://www.knbs.or.ke) and [HDX Kenya Population Statistics (COD-PS)](https://data.humdata.org/dataset/kenya-population-statistics).
+   * **License:** Kenya Open Data / CC BY-IGO.
+
+2. **Tanzania:**
+   * **Agency:** National Bureau of Statistics (NBS) Tanzania & Office of the Chief Government Statistician (OCGS) Zanzibar.
+   * **Source Publication:** *2022 Population and Housing Census (PHC 2022) - Administrative Units Population Distribution Report*.
+   * **Census Date:** 23rd August 2022 (Official National Population: 61,741,120).
+   * **Access:** [NBS Tanzania Census Portal](https://www.nbs.go.tz) and [HDX Tanzania Subnational Population Statistics](https://data.humdata.org/dataset/cod-ps-tza).
+   * **License:** Tanzania Open Government Data / CC BY-IGO.
+
+3. **Uganda:**
+   * **Agency:** Uganda Bureau of Statistics (UBOS).
+   * **Source Publication:** *National Population and Housing Census 2024 (NPHC 2024) Preliminary Census Results* & UBOS Subnational Statistical Abstracts (2023 COD-PS baseline).
+   * **Census Date:** 9th/10th May 2024 (Official Preliminary National Population: 45,905,417).
+   * **Access:** [UBOS Portal](https://www.ubos.org) and [HDX Uganda Population Statistics](https://data.humdata.org/dataset/cod-ps-uga).
+   * **License:** Uganda Government Open Data / CC BY-IGO.
+
+4. **Rwanda:**
+   * **Agency:** National Institute of Statistics of Rwanda (NISR).
+   * **Source Publication:** *5th Rwanda Population and Housing Census (RPHC5 2022) - Final Results: Main Indicators*.
+   * **Census Date:** 15th/16th August 2022 (Official National Population: 13,246,394).
+   * **Access:** [NISR Census Portal](https://www.statistics.gov.rw/datasource/population-and-housing-census) and [HDX Rwanda COD-PS](https://data.humdata.org/dataset/cod-ps-rwa).
+   * **License:** NISR Open Data / CC BY-IGO.
+
+5. **Burundi:**
+   * **Agency:** Institut de Statistiques et d'Études Économiques du Burundi (ISTEEBU) in collaboration with UNFPA.
+   * **Source Publication:** *Projections Démographiques Annuelles au Burundi (2022 Baseline referencing RGPH-2)*.
+   * **Reference Year:** 2022 (National Population: ~12,837,740 - 13,462,695).
+   * **Access:** [ISTEEBU Portal](https://www.isteebu.bi) and [HDX Burundi COD-PS](https://data.humdata.org/dataset/cod-ps-bdi).
+   * **License:** CC BY-IGO / Public Domain.
+
+---
+
+### C. Health, Wellbeing & Socio-Economic Indicators (DHS Program)
+
+* **Agency / Provider:** The Demographic and Health Surveys (DHS) Program (USAID / ICF).
+* **Service:** Official REST API (`https://api.dhsprogram.com/rest/dhs/data`).
+* **License:** Public Open Access (DHS Open Data Policy, USAID).
+* **Surveys Utilized:**
+  * **Kenya:** *Kenya Demographic and Health Survey 2022 (KDHS 2022)*
+  * **Tanzania:** *Tanzania Demographic and Health Survey and Malaria Indicator Survey 2022 (TDHS-MIS 2022)*
+  * **Uganda:** *Uganda Demographic and Health Survey 2016 & 2022 (UDHS)*
+  * **Rwanda:** *Rwanda Demographic and Health Survey 2019-20 (RDHS 2019-20)*
+  * **Burundi:** *Troisième Enquête Démographique et de Santé du Burundi 2016-17 (EDSB-III)*
+* **Harmonized Subnational Metrics Ingested:**
+  * Total Fertility Rate (`FE_FRTR_W_TFR`)
+  * Under-5 Child Mortality Rate per 1,000 live births (`CM_ECMR_C_U5M`)
+  * Child Stunting Prevalence (`CN_NUTS_C_HA2`)
+  * Facility-Based Birth Delivery Rate (`RH_DELP_C_DHF`)
+  * Female Literacy Rate (`ED_LITR_W_LIT`) & Male Literacy Rate (`ED_LITR_M_LIT`)
+  * Access to Improved Drinking Water (`WS_SRCE_P_IMP`)
+  * Access to Improved Sanitation Facilities (`WS_TLET_P_IMP`)
+  * Household Electricity Access Rate (`HC_ELEC_H_ELC`)
+  * Modern Contraceptive Prevalence Rate (`FP_CUSA_W_MOD`)
+
+---
+
+### D. Gridded Population Rasters & Spatial Validation
+
+* **Agency / Provider:** WorldPop Research Group (University of Southampton) & World Bank Open Data.
+* **Datasets:** 1km and 100m unconstrained gridded population distribution rasters (UN-adjusted).
+* **Access:** [WorldPop.org](https://www.worldpop.org) and [World Bank Open Data](https://data.worldbank.org).
+* **License:** Creative Commons Attribution 4.0 International (CC BY 4.0).
+* **Application:** Used for zonal cross-validation of census polygon sums and independent density benchmarking.
+
+---
+
+### E. Source Registry & Reproducibility Documentation
+
+For full raw file paths, SHA checksums, data formats, and individual field dictionaries, refer to the project attribution register:
+* [`data/SOURCES.md`](file:///d:/East%20Africa%20Demographic%20Map/data/SOURCES.md)
+* [`STEP_1_DATA_DISCOVERY_REPORT.md`](file:///C:/Users/ibrahxbt/.gemini/antigravity/brain/ce62b777-b709-48cb-be42-8359b89e28dc/STEP_1_DATA_DISCOVERY_REPORT.md)
 
