@@ -1045,6 +1045,16 @@ def main():
         build_all_east_africa(l1_results)
         run_validation(l1_results)
 
+    try:
+        from pipeline.partition_levels import partition_country_levels
+        if target == "all":
+            for iso in ["KEN", "TZA", "UGA", "RWA", "BDI"]:
+                partition_country_levels(iso)
+        else:
+            partition_country_levels(target)
+    except Exception as e:
+        print(f"Warning: Partitioning failed: {e}")
+
     print("\nPipeline execution finished successfully!")
 
 if __name__ == "__main__":
