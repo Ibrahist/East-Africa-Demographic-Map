@@ -296,18 +296,6 @@ export default function HomePage() {
     ]);
   };
 
-  // Auto-open dossier if a search result feature was selected
-  useEffect(() => {
-    if (hoveredFeatureId && filteredGeojson?.features) {
-      const match = filteredGeojson.features.find(
-        (f: any) => f.properties?.id === hoveredFeatureId
-      );
-      if (match) {
-        setSelectedPlaceFeature(match);
-      }
-    }
-  }, [filteredGeojson, hoveredFeatureId]);
-
   // CSV Export
   const handleExportCSV = () => {
     if (!filteredGeojson || !filteredGeojson.features) return;
