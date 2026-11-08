@@ -241,19 +241,23 @@ export const PlaceExportMenu: React.FC<PlaceExportMenuProps> = ({
               <span className="text-[#8b949e]">Household Size:</span>
               <span className="font-semibold">{p.avg_household_size ? `${p.avg_household_size.toFixed(1)} persons` : "N/A"}</span>
             </div>
-            <div className="flex justify-between py-0.5">
+            <div className="flex justify-between py-0.5 border-b border-[#30363d]/50">
               <span className="text-[#8b949e]">Growth Rate:</span>
-              <span className="font-semibold">{p.intercensal_growth_rate ? `${p.intercensal_growth_rate.toFixed(2)}%/yr` : "N/A"}</span>
+              <span className="font-semibold">{p.intercensal_growth_rate !== undefined && p.intercensal_growth_rate !== null ? `${p.intercensal_growth_rate.toFixed(2)}%/yr` : "N/A"}</span>
+            </div>
+            <div className="flex justify-between py-0.5">
+              <span className="text-[#8b949e]">Urban Share:</span>
+              <span className="font-semibold">{p.urban_share !== undefined && p.urban_share !== null ? `${p.urban_share.toFixed(1)}%` : "N/A"}</span>
             </div>
           </div>
         </div>
 
         {/* Health & Infrastructure Summary (if present) */}
-        {(p.total_fertility_rate || p.under_5_mortality || p.literacy_rate !== undefined || p.electricity_access !== undefined) && (
+        {(p.total_fertility_rate || p.under_5_mortality || p.stunting_rate || p.contraceptive_prevalence || p.literacy_rate !== undefined || p.electricity_access !== undefined || p.improved_water !== undefined) && (
           <div className="space-y-1.5">
             <div className="text-[10px] font-bold text-[#8b949e] uppercase tracking-wider flex items-center gap-1">
               <HeartPulse className="w-3 h-3 text-[#3fb950]" />
-              <span>Health & Infrastructure</span>
+              <span>Health & Wellbeing</span>
             </div>
             <div className="bg-[#0d1117] p-2 rounded-md border border-[#30363d] space-y-1 text-[11px]">
               {p.total_fertility_rate && (
@@ -268,6 +272,18 @@ export const PlaceExportMenu: React.FC<PlaceExportMenuProps> = ({
                   <span className="font-semibold">{p.under_5_mortality.toFixed(1)} /1,000</span>
                 </div>
               )}
+              {p.stunting_rate && (
+                <div className="flex justify-between py-0.5 border-b border-[#30363d]/50">
+                  <span className="text-[#8b949e]">Child Stunting:</span>
+                  <span className="font-semibold">{p.stunting_rate.toFixed(1)}%</span>
+                </div>
+              )}
+              {p.contraceptive_prevalence && (
+                <div className="flex justify-between py-0.5 border-b border-[#30363d]/50">
+                  <span className="text-[#8b949e]">Contraception:</span>
+                  <span className="font-semibold">{p.contraceptive_prevalence.toFixed(1)}%</span>
+                </div>
+              )}
               {p.literacy_rate !== undefined && (
                 <div className="flex justify-between py-0.5 border-b border-[#30363d]/50">
                   <span className="text-[#8b949e]">Literacy Rate:</span>
@@ -275,9 +291,15 @@ export const PlaceExportMenu: React.FC<PlaceExportMenuProps> = ({
                 </div>
               )}
               {p.electricity_access !== undefined && (
-                <div className="flex justify-between py-0.5">
+                <div className="flex justify-between py-0.5 border-b border-[#30363d]/50">
                   <span className="text-[#8b949e]">Electricity:</span>
                   <span className="font-semibold">{p.electricity_access.toFixed(1)}%</span>
+                </div>
+              )}
+              {p.improved_water !== undefined && (
+                <div className="flex justify-between py-0.5">
+                  <span className="text-[#8b949e]">Improved Water:</span>
+                  <span className="font-semibold">{p.improved_water.toFixed(1)}%</span>
                 </div>
               )}
             </div>

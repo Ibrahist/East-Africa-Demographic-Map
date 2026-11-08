@@ -39,8 +39,8 @@ def partition_country_levels(iso):
                 
         print(f"[{iso}] Partitioned Level {lvl} into {len(by_parent)} parent files in {part_dir}")
 
-for iso in COUNTRIES:
-    partition_country_levels(iso)
-
-print("\nPartitioning completed successfully!")
+if __name__ == "__main__":
+    for iso in COUNTRIES:
+        partition_country_levels(iso)
+    print("\nPartitioning completed successfully!")
 

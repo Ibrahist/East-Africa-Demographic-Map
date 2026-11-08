@@ -11,22 +11,29 @@ from pipeline.processor import (
     normalize_name,
     compute_equal_area_km2,
     load_dhs_indicators,
-    AFRICA_ALBERS_PROJ
+    AFRICA_ALBERS_PROJ,
+    UG_DISTRICT_TO_SUBREGION,
+    DHS_ALIASES
 )
 from pipeline.process_kenya import process_kenya
 
 NAME_ALIASES = {
     "TZA": {
-        "pwani": "coast",
-        "north pemba": "pemba north",
-        "south pemba": "pemba south",
-        "zanzibar south & central": "zanzibar central south",
-        "kusini pemba": "pemba south",
-        "kaskazini pemba": "pemba north",
-        "kusini unguja": "zanzibar central south",
-        "kaskazini unguja": "zanzibar north",
-        "mjini magharibi": "zanzibar urban west",
-        "dar es salaam": "dar es salaam"
+        "pwani": "pwani",
+        "coast": "pwani",
+        "north pemba": "kaskazini pemba",
+        "pemba north": "kaskazini pemba",
+        "south pemba": "kusini pemba",
+        "pemba south": "kusini pemba",
+        "zanzibar south & central": "kusini unguja",
+        "zanzibar central south": "kusini unguja",
+        "zanzibar north": "kaskazini unguja",
+        "zanzibar urban west": "mjini magharibi",
+        "zanzibar urban/west": "mjini magharibi",
+        "zanzibar west": "mjini magharibi",
+        "mjini magharibi": "mjini magharibi",
+        "dar es salaam": "dar es salaam",
+        "mbeya": "mbeya"
     },
     "UGA": {
         "rubirzi": "rubirizi",
@@ -41,12 +48,19 @@ NAME_ALIASES = {
         "of kigali": "kigali",
         "city of kigali": "kigali",
         "ville de kigali": "kigali",
+        "kigali": "kigali",
         "sud": "southern",
+        "southern": "southern",
         "nord": "northern",
+        "northern": "northern",
         "est": "eastern",
-        "ouest": "western"
+        "eastern": "eastern",
+        "ouest": "western",
+        "western": "western"
     },
     "BDI": {
+        "karuzi": "karusi",
+        "karusi": "karusi",
         "bujumbura rural": "bujumbura rural",
         "bujumbura mairie": "bujumbura mairie"
     }
@@ -118,7 +132,7 @@ def process_tanzania():
 
         avg_hh = 4.3
         growth = growth_map.get(norm_name, 3.2)
-        dhs_match = DHS_DATA.get(("TZ", norm_name), {})
+        dhs_match = DHS_DATA.get(("TZ", norm_name)) or DHS_DATA.get(("TZ", aliases.get(norm_name, norm_name)), {})
 
         props = {
             "id": stable_id,
@@ -177,6 +191,8 @@ def process_tanzania():
     points_l2 = gpd.GeoDataFrame({'idx': gdf_l2.index}, geometry=gdf_l2_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_parents = gpd.sjoin(points_l2, gdf_l1_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    region_props_map = {f['properties']['id']: f['properties'] for f in features_l1}
+
     merged_l2 = gdf_l2.merge(df_l2_agg, on='norm_name', how='left')
     features_l2 = []
     for idx, row in merged_l2.iterrows():
@@ -189,6 +205,8 @@ def process_tanzania():
         tot_pop = int(float(tot_pop)) if pd.notna(tot_pop) else None
         area = float(row['area_km2'])
         pop_density = round(tot_pop / area, 1) if tot_pop and area > 0 else None
+
+        rp = region_props_map.get(str(p_id), {})
 
         features_l2.append({
             "type": "Feature",
@@ -205,8 +223,23 @@ def process_tanzania():
                 "area_km2": area,
                 "total_population": tot_pop,
                 "population_density": pop_density,
+                "pct_under_15": rp.get("pct_under_15", 43.5),
+                "pct_65_plus": rp.get("pct_65_plus", 3.8),
+                "avg_household_size": rp.get("avg_household_size", 4.3),
+                "number_of_households": int(tot_pop / rp["avg_household_size"]) if tot_pop and rp.get("avg_household_size") else None,
+                "intercensal_growth_rate": rp.get("intercensal_growth_rate", 3.2),
+                "urban_share": rp.get("urban_share", 22.0),
+                "total_fertility_rate": rp.get("total_fertility_rate"),
+                "under_5_mortality": rp.get("under_5_mortality"),
+                "stunting_rate": rp.get("stunting_rate"),
+                "facility_births_pct": rp.get("facility_births_pct"),
+                "contraceptive_prevalence": rp.get("contraceptive_prevalence"),
+                "literacy_rate": rp.get("literacy_rate"),
+                "electricity_access": rp.get("electricity_access"),
+                "improved_water": rp.get("improved_water"),
+                "improved_sanitation": rp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "NBS 2022 Census / COD-PS"
+                "source": "NBS 2022 Census / COD-PS / TDHS 2022"
             },
             "geometry": mapping(row.geometry.simplify(0.003, preserve_topology=True))
         })
@@ -225,12 +258,16 @@ def process_tanzania():
     points_l3 = gpd.GeoDataFrame({'idx': gdf_l3.index}, geometry=gdf_l3_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_l3 = gpd.sjoin(points_l3, gdf_l2_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    district_props_map = {f['properties']['id']: f['properties'] for f in features_l2}
+
     features_l3 = []
     for idx, row in gdf_l3.iterrows():
         stable_id = f"TZA-L3-{idx+1:04d}"
         p_match = joined_l3.loc[joined_l3['idx'] == idx]
         p_id = p_match['id'].values[0] if len(p_match) > 0 and pd.notna(p_match['id'].values[0]) else "TZA-L2-001"
         p_name = p_match['name'].values[0] if len(p_match) > 0 and pd.notna(p_match['name'].values[0]) else "District"
+
+        dp = district_props_map.get(str(p_id), {})
 
         features_l3.append({
             "type": "Feature",
@@ -245,8 +282,22 @@ def process_tanzania():
                 "parent_id": str(p_id),
                 "parent_name": str(p_name),
                 "area_km2": float(row['area_km2']),
+                "pct_under_15": dp.get("pct_under_15", 43.5),
+                "pct_65_plus": dp.get("pct_65_plus", 3.8),
+                "avg_household_size": dp.get("avg_household_size", 4.3),
+                "intercensal_growth_rate": dp.get("intercensal_growth_rate", 3.2),
+                "urban_share": dp.get("urban_share", 22.0),
+                "total_fertility_rate": dp.get("total_fertility_rate"),
+                "under_5_mortality": dp.get("under_5_mortality"),
+                "stunting_rate": dp.get("stunting_rate"),
+                "facility_births_pct": dp.get("facility_births_pct"),
+                "contraceptive_prevalence": dp.get("contraceptive_prevalence"),
+                "literacy_rate": dp.get("literacy_rate"),
+                "electricity_access": dp.get("electricity_access"),
+                "improved_water": dp.get("improved_water"),
+                "improved_sanitation": dp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "NBS Ward Boundaries"
+                "source": "NBS Ward Boundaries / TDHS 2022"
             },
             "geometry": mapping(row.geometry.simplify(0.002, preserve_topology=True))
         })
@@ -267,6 +318,8 @@ def process_tanzania():
         features_l4 = []
         for idx, row in joined_osm.iterrows():
             stable_id = f"TZA-L4-{len(features_l4)+1:04d}"
+            pid_str = str(row['id']) if pd.notna(row.get('id')) else "TZA-L2-001"
+            dp_p = district_props_map.get(pid_str, {})
             features_l4.append({
                 "type": "Feature",
                 "id": stable_id,
@@ -277,10 +330,19 @@ def process_tanzania():
                     "country_name": "Tanzania",
                     "level": 4,
                     "level_name": "Village / Mtaa",
-                    "parent_id": str(row['id']) if pd.notna(row.get('id')) else "TZA-L2-001",
+                    "parent_id": pid_str,
                     "parent_name": str(row['name_right']) if pd.notna(row.get('name_right')) else "Unknown",
                     "place_type": row['place'],
                     "is_point": True,
+                    "intercensal_growth_rate": dp_p.get("intercensal_growth_rate", 3.2),
+                    "total_fertility_rate": dp_p.get("total_fertility_rate"),
+                    "under_5_mortality": dp_p.get("under_5_mortality"),
+                    "stunting_rate": dp_p.get("stunting_rate"),
+                    "facility_births_pct": dp_p.get("facility_births_pct"),
+                    "literacy_rate": dp_p.get("literacy_rate"),
+                    "electricity_access": dp_p.get("electricity_access"),
+                    "improved_water": dp_p.get("improved_water"),
+                    "improved_sanitation": dp_p.get("improved_sanitation"),
                     "source": "OpenStreetMap contributors (ODbL 1.0)"
                 },
                 "geometry": mapping(gdf_osm.loc[idx].geometry)
@@ -342,7 +404,8 @@ def process_uganda():
         m_pop = row.get('M_TL')
         sex_ratio = round((float(m_pop) / float(f_pop)) * 100, 1) if pd.notna(f_pop) and pd.notna(m_pop) and float(f_pop) > 0 else 95.0
 
-        dhs_match = DHS_DATA.get(("UG", norm_name), {})
+        subreg = UG_DISTRICT_TO_SUBREGION.get(norm_name, norm_name)
+        dhs_match = DHS_DATA.get(("UG", subreg)) or DHS_DATA.get(("UG", norm_name), {})
 
         features_l1.append({
             "type": "Feature",
@@ -356,7 +419,7 @@ def process_uganda():
                 "level_name": "District",
                 "parent_id": None,
                 "reference_year": 2024,
-                "source": "UBOS 2024 Census & Baseline / UDHS",
+                "source": "UBOS 2024 Census & Baseline / UDHS 2016",
                 "area_km2": area,
                 "total_population": tot_pop,
                 "population_density": pop_density,
@@ -364,13 +427,15 @@ def process_uganda():
                 "pct_under_15": 47.0,
                 "pct_65_plus": 2.7,
                 "avg_household_size": 4.5,
+                "number_of_households": int(tot_pop / 4.5) if tot_pop else None,
                 "intercensal_growth_rate": 2.9,
-                "literacy_rate": 74.0,
+                "urban_share": 100.0 if norm_name == 'kampala' else (35.0 if norm_name in ['wakiso', 'mukono', 'jinja', 'mbarara', 'gulu'] else 18.0),
                 "total_fertility_rate": dhs_match.get("total_fertility_rate", 5.4),
                 "under_5_mortality": dhs_match.get("under_5_mortality", 64.0),
                 "stunting_rate": dhs_match.get("stunting_rate", 29.0),
                 "facility_births_pct": dhs_match.get("facility_births_pct", 73.0),
                 "contraceptive_prevalence": dhs_match.get("contraceptive_prevalence", 39.0),
+                "literacy_rate": dhs_match.get("literacy_rate", 74.0),
                 "electricity_access": dhs_match.get("electricity_access", 28.0),
                 "improved_water": dhs_match.get("improved_water", 78.0),
                 "improved_sanitation": dhs_match.get("improved_sanitation", 19.0)
@@ -392,12 +457,16 @@ def process_uganda():
     points_l2 = gpd.GeoDataFrame({'idx': gdf_l2.index}, geometry=gdf_l2_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_parents = gpd.sjoin(points_l2, gdf_l1_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    district_props_map = {f['properties']['id']: f['properties'] for f in features_l1}
+
     features_l2 = []
     for idx, row in gdf_l2.iterrows():
         stable_id = f"UGA-L2-{idx+1:03d}"
         p_match = joined_parents.loc[joined_parents['idx'] == idx]
         p_id = p_match['id'].values[0] if len(p_match) > 0 and pd.notna(p_match['id'].values[0]) else "UGA-L1-001"
         p_name = p_match['name'].values[0] if len(p_match) > 0 and pd.notna(p_match['name'].values[0]) else "District"
+
+        dp = district_props_map.get(str(p_id), {})
 
         features_l2.append({
             "type": "Feature",
@@ -412,8 +481,22 @@ def process_uganda():
                 "parent_id": str(p_id),
                 "parent_name": str(p_name),
                 "area_km2": float(row['area_km2']),
+                "pct_under_15": dp.get("pct_under_15", 47.0),
+                "pct_65_plus": dp.get("pct_65_plus", 2.7),
+                "avg_household_size": dp.get("avg_household_size", 4.5),
+                "intercensal_growth_rate": dp.get("intercensal_growth_rate", 2.9),
+                "urban_share": dp.get("urban_share", 18.0),
+                "total_fertility_rate": dp.get("total_fertility_rate"),
+                "under_5_mortality": dp.get("under_5_mortality"),
+                "stunting_rate": dp.get("stunting_rate"),
+                "facility_births_pct": dp.get("facility_births_pct"),
+                "contraceptive_prevalence": dp.get("contraceptive_prevalence"),
+                "literacy_rate": dp.get("literacy_rate"),
+                "electricity_access": dp.get("electricity_access"),
+                "improved_water": dp.get("improved_water"),
+                "improved_sanitation": dp.get("improved_sanitation"),
                 "reference_year": 2024,
-                "source": "UBOS County Boundaries"
+                "source": "UBOS County Boundaries / UDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.003, preserve_topology=True))
         })
@@ -432,12 +515,16 @@ def process_uganda():
     points_l3 = gpd.GeoDataFrame({'idx': gdf_l3.index}, geometry=gdf_l3_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_l3 = gpd.sjoin(points_l3, gdf_l2_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    county_props_map = {f['properties']['id']: f['properties'] for f in features_l2}
+
     features_l3 = []
     for idx, row in gdf_l3.iterrows():
         stable_id = f"UGA-L3-{idx+1:04d}"
         p_match = joined_l3.loc[joined_l3['idx'] == idx]
         p_id = p_match['id'].values[0] if len(p_match) > 0 and pd.notna(p_match['id'].values[0]) else "UGA-L2-001"
         p_name = p_match['name'].values[0] if len(p_match) > 0 and pd.notna(p_match['name'].values[0]) else "County"
+
+        cp = county_props_map.get(str(p_id), {})
 
         features_l3.append({
             "type": "Feature",
@@ -452,8 +539,22 @@ def process_uganda():
                 "parent_id": str(p_id),
                 "parent_name": str(p_name),
                 "area_km2": float(row['area_km2']),
+                "pct_under_15": cp.get("pct_under_15", 47.0),
+                "pct_65_plus": cp.get("pct_65_plus", 2.7),
+                "avg_household_size": cp.get("avg_household_size", 4.5),
+                "intercensal_growth_rate": cp.get("intercensal_growth_rate", 2.9),
+                "urban_share": cp.get("urban_share", 18.0),
+                "total_fertility_rate": cp.get("total_fertility_rate"),
+                "under_5_mortality": cp.get("under_5_mortality"),
+                "stunting_rate": cp.get("stunting_rate"),
+                "facility_births_pct": cp.get("facility_births_pct"),
+                "contraceptive_prevalence": cp.get("contraceptive_prevalence"),
+                "literacy_rate": cp.get("literacy_rate"),
+                "electricity_access": cp.get("electricity_access"),
+                "improved_water": cp.get("improved_water"),
+                "improved_sanitation": cp.get("improved_sanitation"),
                 "reference_year": 2024,
-                "source": "UBOS Sub-county Boundaries"
+                "source": "UBOS Sub-county Boundaries / UDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.002, preserve_topology=True))
         })
@@ -474,6 +575,8 @@ def process_uganda():
         features_l4 = []
         for idx, row in joined_osm.iterrows():
             stable_id = f"UGA-L4-{len(features_l4)+1:04d}"
+            pid_str = str(row['id']) if pd.notna(row.get('id')) else "UGA-L2-001"
+            cp_p = county_props_map.get(pid_str, {})
             features_l4.append({
                 "type": "Feature",
                 "id": stable_id,
@@ -484,10 +587,19 @@ def process_uganda():
                     "country_name": "Uganda",
                     "level": 4,
                     "level_name": "Parish / Village",
-                    "parent_id": str(row['id']) if pd.notna(row.get('id')) else "UGA-L2-001",
+                    "parent_id": pid_str,
                     "parent_name": str(row['name_right']) if pd.notna(row.get('name_right')) else "Unknown",
                     "place_type": row['place'],
                     "is_point": True,
+                    "intercensal_growth_rate": cp_p.get("intercensal_growth_rate", 2.9),
+                    "total_fertility_rate": cp_p.get("total_fertility_rate"),
+                    "under_5_mortality": cp_p.get("under_5_mortality"),
+                    "stunting_rate": cp_p.get("stunting_rate"),
+                    "facility_births_pct": cp_p.get("facility_births_pct"),
+                    "literacy_rate": cp_p.get("literacy_rate"),
+                    "electricity_access": cp_p.get("electricity_access"),
+                    "improved_water": cp_p.get("improved_water"),
+                    "improved_sanitation": cp_p.get("improved_sanitation"),
                     "source": "OpenStreetMap contributors (ODbL 1.0)"
                 },
                 "geometry": mapping(gdf_osm.loc[idx].geometry)
@@ -541,7 +653,7 @@ def process_rwanda():
         m_pop = row.get('M_TL')
         sex_ratio = round((float(m_pop) / float(f_pop)) * 100, 1) if pd.notna(f_pop) and pd.notna(m_pop) and float(f_pop) > 0 else 94.0
 
-        dhs_match = DHS_DATA.get(("RW", norm_name), {})
+        dhs_match = DHS_DATA.get(("RW", norm_name)) or DHS_DATA.get(("RW", aliases.get(norm_name, norm_name)), {})
 
         features_l1.append({
             "type": "Feature",
@@ -563,6 +675,7 @@ def process_rwanda():
                 "pct_under_15": 38.5,
                 "pct_65_plus": 3.4,
                 "avg_household_size": 4.0,
+                "number_of_households": int(tot_pop / 4.0) if tot_pop else None,
                 "intercensal_growth_rate": 2.3,
                 "urban_share": 100.0 if 'kigali' in norm_name else 14.5,
                 "total_fertility_rate": dhs_match.get("total_fertility_rate", 4.1),
@@ -597,6 +710,8 @@ def process_rwanda():
     points_l2 = gpd.GeoDataFrame({'idx': gdf_l2.index}, geometry=gdf_l2_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_parents = gpd.sjoin(points_l2, gdf_l1_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    prov_props_map = {f['properties']['id']: f['properties'] for f in features_l1}
+
     merged_l2 = gdf_l2.merge(df_l2_agg, on='norm_name', how='left')
     features_l2 = []
     for idx, row in merged_l2.iterrows():
@@ -609,6 +724,8 @@ def process_rwanda():
         tot_pop = int(float(tot_pop)) if pd.notna(tot_pop) else None
         area = float(row['area_km2'])
         pop_density = round(tot_pop / area, 1) if tot_pop and area > 0 else None
+
+        pp = prov_props_map.get(str(p_id), {})
 
         features_l2.append({
             "type": "Feature",
@@ -625,8 +742,23 @@ def process_rwanda():
                 "area_km2": area,
                 "total_population": tot_pop,
                 "population_density": pop_density,
+                "pct_under_15": pp.get("pct_under_15", 38.5),
+                "pct_65_plus": pp.get("pct_65_plus", 3.4),
+                "avg_household_size": pp.get("avg_household_size", 4.0),
+                "number_of_households": int(tot_pop / pp["avg_household_size"]) if tot_pop and pp.get("avg_household_size") else None,
+                "intercensal_growth_rate": pp.get("intercensal_growth_rate", 2.3),
+                "urban_share": pp.get("urban_share", 14.5),
+                "total_fertility_rate": pp.get("total_fertility_rate"),
+                "under_5_mortality": pp.get("under_5_mortality"),
+                "stunting_rate": pp.get("stunting_rate"),
+                "facility_births_pct": pp.get("facility_births_pct"),
+                "contraceptive_prevalence": pp.get("contraceptive_prevalence"),
+                "literacy_rate": pp.get("literacy_rate"),
+                "electricity_access": pp.get("electricity_access"),
+                "improved_water": pp.get("improved_water"),
+                "improved_sanitation": pp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "NISR RPHC5 2022 Census"
+                "source": "NISR RPHC5 2022 Census / RDHS 2020"
             },
             "geometry": mapping(row.geometry.simplify(0.003, preserve_topology=True))
         })
@@ -650,6 +782,8 @@ def process_rwanda():
     points_l3 = gpd.GeoDataFrame({'idx': gdf_l3.index}, geometry=gdf_l3_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_l3 = gpd.sjoin(points_l3, gdf_l2_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    dist_props_map = {f['properties']['id']: f['properties'] for f in features_l2}
+
     merged_l3 = gdf_l3.merge(df_l3_agg, on='norm_name', how='left')
     features_l3 = []
     for idx, row in merged_l3.iterrows():
@@ -662,6 +796,8 @@ def process_rwanda():
         tot_pop = int(float(tot_pop)) if pd.notna(tot_pop) else None
         area = float(row['area_km2'])
         pop_density = round(tot_pop / area, 1) if tot_pop and area > 0 else None
+
+        dp = dist_props_map.get(str(p_id), {})
 
         features_l3.append({
             "type": "Feature",
@@ -678,8 +814,23 @@ def process_rwanda():
                 "area_km2": area,
                 "total_population": tot_pop,
                 "population_density": pop_density,
+                "pct_under_15": dp.get("pct_under_15", 38.5),
+                "pct_65_plus": dp.get("pct_65_plus", 3.4),
+                "avg_household_size": dp.get("avg_household_size", 4.0),
+                "number_of_households": int(tot_pop / dp["avg_household_size"]) if tot_pop and dp.get("avg_household_size") else None,
+                "intercensal_growth_rate": dp.get("intercensal_growth_rate", 2.3),
+                "urban_share": dp.get("urban_share", 14.5),
+                "total_fertility_rate": dp.get("total_fertility_rate"),
+                "under_5_mortality": dp.get("under_5_mortality"),
+                "stunting_rate": dp.get("stunting_rate"),
+                "facility_births_pct": dp.get("facility_births_pct"),
+                "contraceptive_prevalence": dp.get("contraceptive_prevalence"),
+                "literacy_rate": dp.get("literacy_rate"),
+                "electricity_access": dp.get("electricity_access"),
+                "improved_water": dp.get("improved_water"),
+                "improved_sanitation": dp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "NISR RPHC5 2022 Census"
+                "source": "NISR RPHC5 2022 Census / RDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.002, preserve_topology=True))
         })
@@ -698,12 +849,16 @@ def process_rwanda():
     points_l4 = gpd.GeoDataFrame({'idx': gdf_l4.index}, geometry=gdf_l4_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_l4 = gpd.sjoin(points_l4, gdf_l3_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    sect_props_map = {f['properties']['id']: f['properties'] for f in features_l3}
+
     features_l4 = []
     for idx, row in gdf_l4.iterrows():
         stable_id = f"RWA-L4-{idx+1:04d}"
         p_match = joined_l4.loc[joined_l4['idx'] == idx]
         p_id = p_match['id'].values[0] if len(p_match) > 0 and pd.notna(p_match['id'].values[0]) else "RWA-L3-0001"
         p_name = p_match['name'].values[0] if len(p_match) > 0 and pd.notna(p_match['name'].values[0]) else "Sector"
+
+        sp = sect_props_map.get(str(p_id), {})
 
         features_l4.append({
             "type": "Feature",
@@ -718,8 +873,22 @@ def process_rwanda():
                 "parent_id": str(p_id),
                 "parent_name": str(p_name),
                 "area_km2": float(row['area_km2']),
+                "pct_under_15": sp.get("pct_under_15", 38.5),
+                "pct_65_plus": sp.get("pct_65_plus", 3.4),
+                "avg_household_size": sp.get("avg_household_size", 4.0),
+                "intercensal_growth_rate": sp.get("intercensal_growth_rate", 2.3),
+                "urban_share": sp.get("urban_share", 14.5),
+                "total_fertility_rate": sp.get("total_fertility_rate"),
+                "under_5_mortality": sp.get("under_5_mortality"),
+                "stunting_rate": sp.get("stunting_rate"),
+                "facility_births_pct": sp.get("facility_births_pct"),
+                "contraceptive_prevalence": sp.get("contraceptive_prevalence"),
+                "literacy_rate": sp.get("literacy_rate"),
+                "electricity_access": sp.get("electricity_access"),
+                "improved_water": sp.get("improved_water"),
+                "improved_sanitation": sp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "NISR Cell Boundaries"
+                "source": "NISR Cell Boundaries / RDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.0015, preserve_topology=True))
         })
@@ -771,7 +940,7 @@ def process_burundi():
         m_pop = row.get('M_TL')
         sex_ratio = round((float(m_pop) / float(f_pop)) * 100, 1) if pd.notna(f_pop) and pd.notna(m_pop) and float(f_pop) > 0 else 98.0
 
-        dhs_match = DHS_DATA.get(("BU", norm_name), {})
+        dhs_match = DHS_DATA.get(("BU", norm_name)) or DHS_DATA.get(("BU", aliases.get(norm_name, norm_name)), {})
 
         features_l1.append({
             "type": "Feature",
@@ -793,6 +962,7 @@ def process_burundi():
                 "pct_under_15": 44.5,
                 "pct_65_plus": 2.5,
                 "avg_household_size": 4.8,
+                "number_of_households": int(tot_pop / 4.8) if tot_pop else None,
                 "intercensal_growth_rate": 2.8,
                 "urban_share": 100.0 if 'mairie' in norm_name else 11.5,
                 "total_fertility_rate": dhs_match.get("total_fertility_rate", 5.5),
@@ -827,6 +997,8 @@ def process_burundi():
     points_l2 = gpd.GeoDataFrame({'idx': gdf_l2.index}, geometry=gdf_l2_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_parents = gpd.sjoin(points_l2, gdf_l1_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    prov_props_map = {f['properties']['id']: f['properties'] for f in features_l1}
+
     merged_l2 = gdf_l2.merge(df_l2_agg, on='norm_name', how='left')
     features_l2 = []
     for idx, row in merged_l2.iterrows():
@@ -839,6 +1011,8 @@ def process_burundi():
         tot_pop = int(float(tot_pop)) if pd.notna(tot_pop) else None
         area = float(row['area_km2'])
         pop_density = round(tot_pop / area, 1) if tot_pop and area > 0 else None
+
+        pp = prov_props_map.get(str(p_id), {})
 
         features_l2.append({
             "type": "Feature",
@@ -855,8 +1029,23 @@ def process_burundi():
                 "area_km2": area,
                 "total_population": tot_pop,
                 "population_density": pop_density,
+                "pct_under_15": pp.get("pct_under_15", 44.5),
+                "pct_65_plus": pp.get("pct_65_plus", 2.5),
+                "avg_household_size": pp.get("avg_household_size", 4.8),
+                "number_of_households": int(tot_pop / pp["avg_household_size"]) if tot_pop and pp.get("avg_household_size") else None,
+                "intercensal_growth_rate": pp.get("intercensal_growth_rate", 2.8),
+                "urban_share": pp.get("urban_share", 11.5),
+                "total_fertility_rate": pp.get("total_fertility_rate"),
+                "under_5_mortality": pp.get("under_5_mortality"),
+                "stunting_rate": pp.get("stunting_rate"),
+                "facility_births_pct": pp.get("facility_births_pct"),
+                "contraceptive_prevalence": pp.get("contraceptive_prevalence"),
+                "literacy_rate": pp.get("literacy_rate"),
+                "electricity_access": pp.get("electricity_access"),
+                "improved_water": pp.get("improved_water"),
+                "improved_sanitation": pp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "ISTEEBU 2022 Projections"
+                "source": "ISTEEBU 2022 Projections / BDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.003, preserve_topology=True))
         })
@@ -875,12 +1064,16 @@ def process_burundi():
     points_l3 = gpd.GeoDataFrame({'idx': gdf_l3.index}, geometry=gdf_l3_proj.geometry.centroid, crs=AFRICA_ALBERS_PROJ)
     joined_l3 = gpd.sjoin(points_l3, gdf_l2_proj[['id', 'name', 'geometry']], how='left', predicate='within')
 
+    comm_props_map = {f['properties']['id']: f['properties'] for f in features_l2}
+
     features_l3 = []
     for idx, row in gdf_l3.iterrows():
         stable_id = f"BDI-L3-{idx+1:04d}"
         p_match = joined_l3.loc[joined_l3['idx'] == idx]
         p_id = p_match['id'].values[0] if len(p_match) > 0 and pd.notna(p_match['id'].values[0]) else "BDI-L2-001"
         p_name = p_match['name'].values[0] if len(p_match) > 0 and pd.notna(p_match['name'].values[0]) else "Commune"
+
+        cp = comm_props_map.get(str(p_id), {})
 
         features_l3.append({
             "type": "Feature",
@@ -895,8 +1088,22 @@ def process_burundi():
                 "parent_id": str(p_id),
                 "parent_name": str(p_name),
                 "area_km2": float(row['area_km2']),
+                "pct_under_15": cp.get("pct_under_15", 44.5),
+                "pct_65_plus": cp.get("pct_65_plus", 2.5),
+                "avg_household_size": cp.get("avg_household_size", 4.8),
+                "intercensal_growth_rate": cp.get("intercensal_growth_rate", 2.8),
+                "urban_share": cp.get("urban_share", 11.5),
+                "total_fertility_rate": cp.get("total_fertility_rate"),
+                "under_5_mortality": cp.get("under_5_mortality"),
+                "stunting_rate": cp.get("stunting_rate"),
+                "facility_births_pct": cp.get("facility_births_pct"),
+                "contraceptive_prevalence": cp.get("contraceptive_prevalence"),
+                "literacy_rate": cp.get("literacy_rate"),
+                "electricity_access": cp.get("electricity_access"),
+                "improved_water": cp.get("improved_water"),
+                "improved_sanitation": cp.get("improved_sanitation"),
                 "reference_year": 2022,
-                "source": "ISTEEBU Colline Boundaries"
+                "source": "ISTEEBU Colline Boundaries / BDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.002, preserve_topology=True))
         })
@@ -917,6 +1124,8 @@ def process_burundi():
         features_l4 = []
         for idx, row in joined_osm.iterrows():
             stable_id = f"BDI-L4-{len(features_l4)+1:04d}"
+            pid_str = str(row['id']) if pd.notna(row.get('id')) else "BDI-L2-001"
+            cp_p = comm_props_map.get(pid_str, {})
             features_l4.append({
                 "type": "Feature",
                 "id": stable_id,
@@ -927,10 +1136,19 @@ def process_burundi():
                     "country_name": "Burundi",
                     "level": 4,
                     "level_name": "Village / Sous-colline",
-                    "parent_id": str(row['id']) if pd.notna(row.get('id')) else "BDI-L2-001",
+                    "parent_id": pid_str,
                     "parent_name": str(row['name_right']) if pd.notna(row.get('name_right')) else "Unknown",
                     "place_type": row['place'],
                     "is_point": True,
+                    "intercensal_growth_rate": cp_p.get("intercensal_growth_rate", 2.8),
+                    "total_fertility_rate": cp_p.get("total_fertility_rate"),
+                    "under_5_mortality": cp_p.get("under_5_mortality"),
+                    "stunting_rate": cp_p.get("stunting_rate"),
+                    "facility_births_pct": cp_p.get("facility_births_pct"),
+                    "literacy_rate": cp_p.get("literacy_rate"),
+                    "electricity_access": cp_p.get("electricity_access"),
+                    "improved_water": cp_p.get("improved_water"),
+                    "improved_sanitation": cp_p.get("improved_sanitation"),
                     "source": "OpenStreetMap contributors (ODbL 1.0)"
                 },
                 "geometry": mapping(gdf_osm.loc[idx].geometry)
@@ -1059,4 +1277,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

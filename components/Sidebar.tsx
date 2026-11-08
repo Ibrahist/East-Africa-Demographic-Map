@@ -228,8 +228,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {catIndicators.map((ind) => {
                       const isSelected = selectedIndicatorId === ind.id;
                       const disabledInRegion = isAllEastAfrica && !ind.comparable_east_africa;
-                      const disabledAtLevel = selectedLevel > 1 && ind.category === "health_wellbeing";
-                      const isDisabled = disabledInRegion || disabledAtLevel;
+                      const isDisabled = disabledInRegion;
 
                       return (
                         <button
@@ -247,7 +246,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <span className="truncate">{ind.label}</span>
                           {isDisabled && (
                             <span className="text-[9px] text-[#8c959f] dark:text-[#484f58] ml-1 flex-shrink-0">
-                              {disabledAtLevel ? "L1 only" : "Country only"}
+                              Country only
                             </span>
                           )}
                         </button>

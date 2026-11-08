@@ -107,23 +107,29 @@ export const Tooltip: React.FC<TooltipProps> = ({ state, indicator }) => {
       </div>
 
       {/* Age Structure & Growth */}
-      <div className="grid grid-cols-3 gap-1 text-[10px] text-[#c9d1d9] mb-2 py-1 border-t border-b border-[#30363d]/60">
+      <div className="grid grid-cols-2 gap-1.5 text-[10px] text-[#c9d1d9] mb-2 py-1.5 border-t border-b border-[#30363d]/60">
         <div>
           <span className="text-[#8b949e]">&lt;15 yrs: </span>
           <span className="font-medium text-[#f0f6fc]">
-            {p.pct_under_15 ? `${p.pct_under_15.toFixed(1)}%` : "N/A"}
+            {p.pct_under_15 !== undefined && p.pct_under_15 !== null ? `${p.pct_under_15.toFixed(1)}%` : "N/A"}
           </span>
         </div>
         <div>
           <span className="text-[#8b949e]">65+ yrs: </span>
           <span className="font-medium text-[#f0f6fc]">
-            {p.pct_65_plus ? `${p.pct_65_plus.toFixed(1)}%` : "N/A"}
+            {p.pct_65_plus !== undefined && p.pct_65_plus !== null ? `${p.pct_65_plus.toFixed(1)}%` : "N/A"}
           </span>
         </div>
         <div>
-          <span className="text-[#8b949e]">Hh size: </span>
-          <span className="font-medium text-[#f0f6fc]">
-            {p.avg_household_size ? p.avg_household_size.toFixed(1) : "N/A"}
+          <span className="text-[#8b949e]">Pop Growth: </span>
+          <span className="font-semibold text-[#58a6ff]">
+            {p.intercensal_growth_rate !== undefined && p.intercensal_growth_rate !== null ? `${p.intercensal_growth_rate.toFixed(1)}%/yr` : "N/A"}
+          </span>
+        </div>
+        <div>
+          <span className="text-[#8b949e]">Urban Share: </span>
+          <span className="font-semibold text-[#58a6ff]">
+            {p.urban_share !== undefined && p.urban_share !== null ? `${p.urban_share.toFixed(1)}%` : "N/A"}
           </span>
         </div>
       </div>
@@ -133,20 +139,23 @@ export const Tooltip: React.FC<TooltipProps> = ({ state, indicator }) => {
         <div className="text-[10px] space-y-0.5 mb-2 pb-1 border-b border-[#30363d]/60">
           <div className="text-[9px] font-bold text-[#3fb950] uppercase flex items-center gap-1">
             <HeartPulse className="w-3 h-3" />
-            <span>Health & DHS Metrics</span>
+            <span>Health & Wellbeing</span>
           </div>
           <div className="grid grid-cols-2 gap-1 text-[#c9d1d9]">
-            {p.total_fertility_rate && (
-              <div>Fertility: <span className="text-[#f0f6fc] font-semibold">{p.total_fertility_rate.toFixed(1)}</span></div>
+            {p.total_fertility_rate !== undefined && p.total_fertility_rate !== null && (
+              <div>Fertility (TFR): <span className="text-[#f0f6fc] font-semibold">{p.total_fertility_rate.toFixed(1)}</span></div>
             )}
-            {p.under_5_mortality && (
+            {p.under_5_mortality !== undefined && p.under_5_mortality !== null && (
               <div>U5MR: <span className="text-[#f0f6fc] font-semibold">{p.under_5_mortality.toFixed(1)}/1k</span></div>
             )}
-            {p.stunting_rate && (
+            {p.stunting_rate !== undefined && p.stunting_rate !== null && (
               <div>Stunting: <span className="text-[#f0f6fc] font-semibold">{p.stunting_rate.toFixed(1)}%</span></div>
             )}
-            {p.facility_births_pct && (
-              <div>Facility: <span className="text-[#f0f6fc] font-semibold">{p.facility_births_pct.toFixed(1)}%</span></div>
+            {p.facility_births_pct !== undefined && p.facility_births_pct !== null && (
+              <div>Facility Births: <span className="text-[#f0f6fc] font-semibold">{p.facility_births_pct.toFixed(1)}%</span></div>
+            )}
+            {p.contraceptive_prevalence !== undefined && p.contraceptive_prevalence !== null && (
+              <div>Contraception: <span className="text-[#f0f6fc] font-semibold">{p.contraceptive_prevalence.toFixed(1)}%</span></div>
             )}
           </div>
         </div>
@@ -155,17 +164,21 @@ export const Tooltip: React.FC<TooltipProps> = ({ state, indicator }) => {
       {/* Amenities & Infrastructure (if available) */}
       {hasAmenities && (
         <div className="text-[10px] space-y-0.5 mb-2 pb-1 border-b border-[#30363d]/60">
+          <div className="text-[9px] font-bold text-[#58a6ff] uppercase flex items-center gap-1">
+            <Sparkles className="w-3 h-3" />
+            <span>Education & Economy</span>
+          </div>
           <div className="grid grid-cols-2 gap-1 text-[#c9d1d9]">
-            {p.literacy_rate !== undefined && (
+            {p.literacy_rate !== undefined && p.literacy_rate !== null && (
               <div>Literacy: <span className="text-[#f0f6fc] font-semibold">{p.literacy_rate.toFixed(1)}%</span></div>
             )}
-            {p.electricity_access !== undefined && (
+            {p.electricity_access !== undefined && p.electricity_access !== null && (
               <div>Electricity: <span className="text-[#f0f6fc] font-semibold">{p.electricity_access.toFixed(1)}%</span></div>
             )}
-            {p.improved_water !== undefined && (
+            {p.improved_water !== undefined && p.improved_water !== null && (
               <div>Water: <span className="text-[#f0f6fc] font-semibold">{p.improved_water.toFixed(1)}%</span></div>
             )}
-            {p.improved_sanitation !== undefined && (
+            {p.improved_sanitation !== undefined && p.improved_sanitation !== null && (
               <div>Sanitation: <span className="text-[#f0f6fc] font-semibold">{p.improved_sanitation.toFixed(1)}%</span></div>
             )}
           </div>

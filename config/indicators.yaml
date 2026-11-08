@@ -87,7 +87,7 @@ indicators:
     format: "integer"
     color_palette: "Blues"
     description: "Total count of enumerated private households."
-    comparable_east_africa: false
+    comparable_east_africa: true
     reference_note: "Available for Kenya, Tanzania, Rwanda."
 
   # 2. Growth & Migration
@@ -110,7 +110,7 @@ indicators:
     format: "percent_1"
     color_palette: "PuRd"
     description: "Percentage of the population residing in gazetted urban centers, municipalities, or cities."
-    comparable_east_africa: false
+    comparable_east_africa: true
     reference_note: "National urban definitions vary between countries."
 
   # 3. Health & Wellbeing (DHS Program & Census)

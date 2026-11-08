@@ -52,13 +52,24 @@ export function computeBreaks(
 ): number[] {
   const valid = values.filter((v) => v !== null && v !== undefined && !isNaN(v)).sort((a, b) => a - b);
   if (valid.length === 0) return [0, 1];
-  if (valid.length <= numClasses) return Array.from(new Set(valid));
+
+  const unique = Array.from(new Set(valid));
+  if (unique.length === 1) {
+    const single = unique[0];
+    const delta = single === 0 ? 1 : Math.max(0.1, Math.abs(single) * 0.1);
+    return [Math.max(0, single - delta), single + delta];
+  }
+
+  if (unique.length <= numClasses) {
+    return unique;
+  }
 
   const min = valid[0];
   const max = valid[valid.length - 1];
 
   if (min === max) {
-    return [min, max];
+    const delta = min === 0 ? 1 : Math.max(0.1, Math.abs(min) * 0.1);
+    return [Math.max(0, min - delta), min + delta];
   }
 
   if (method === "quantile") {
@@ -70,7 +81,7 @@ export function computeBreaks(
         breaks.push(val);
       }
     }
-    return breaks;
+    return breaks.length >= 2 ? breaks : [min, max];
   }
 
   if (method === "equal") {
@@ -91,7 +102,7 @@ export function computeBreaks(
       qBreaks.push(val);
     }
   }
-  return qBreaks;
+  return qBreaks.length >= 2 ? qBreaks : [min, max];
 }
 
 export function generateLegendBreaks(
@@ -101,6 +112,16 @@ export function generateLegendBreaks(
   unit?: string
 ): LegendBreak[] {
   const palette = COLOR_PALETTES[paletteKey] || COLOR_PALETTES.Viridis;
+  if (!breaks || breaks.length === 0) return [];
+  if (breaks.length === 1) {
+    return [{
+      color: palette.interpolator(0.5),
+      min: breaks[0],
+      max: breaks[0],
+      label: formatValue(breaks[0], format, unit)
+    }];
+  }
+
   const numSteps = Math.max(1, breaks.length - 1);
   const legendBreaks: LegendBreak[] = [];
 
@@ -132,6 +153,13 @@ export function getColorForValue(
     return missingColor;
   }
   const palette = COLOR_PALETTES[paletteKey] || COLOR_PALETTES.Viridis;
+  if (!breaks || breaks.length === 0) {
+    return palette.interpolator(0.5);
+  }
+  if (breaks.length === 1) {
+    return palette.interpolator(0.5);
+  }
+
   const numSteps = Math.max(1, breaks.length - 1);
 
   if (value <= breaks[0]) {
@@ -148,6 +176,6 @@ export function getColorForValue(
     }
   }
 
-  return missingColor;
+  return palette.interpolator(0.5);
 }
 

@@ -14,11 +14,15 @@ def normalize_name(name):
     if not isinstance(name, str):
         return ""
     n = name.strip().lower()
+    # Remove leading dots from DHS / census tables
+    n = re.sub(r"^\.+", "", n).strip()
+    # Remove parenthetical notes e.g. "(since 2016)"
+    n = re.sub(r"\(.*?\)", "", n).strip()
     # Replace special characters and extra spaces
     n = re.sub(r"['’`]", "", n)
     n = re.sub(r"[-_/]", " ", n)
     # Remove common administrative stopwords
-    stopwords = ["county", "subcounty", "district", "region", "province", "commune", "ward", "sector", "cell", "city of", "city", "town", "urban", "rural"]
+    stopwords = ["county", "subcounty", "sub-county", "district", "region", "province", "commune", "ward", "sector", "cell", "city", "of", "town", "urban", "rural"]
     words = [w for w in n.split() if w not in stopwords]
     return " ".join(words)
 
@@ -30,6 +34,83 @@ def compute_equal_area_km2(gdf):
         # Fallback to geodesic approximation if crs projection fails
         return gdf.geometry.to_crs(epsg=6933).area / 1_000_000.0
 
+# Sub-region mapping for Uganda's 136 districts to DHS survey clusters
+UG_DISTRICT_TO_SUBREGION = {
+    'kampala': 'kampala',
+    'bukomansimbi': 'south buganda', 'butambala': 'south buganda', 'gomba': 'south buganda',
+    'kalangala': 'south buganda', 'kalanga': 'south buganda', 'kalungu': 'south buganda',
+    'kyotera': 'south buganda', 'lwengo': 'south buganda', 'lyantonde': 'south buganda',
+    'masaka': 'south buganda', 'mpigi': 'south buganda', 'rakai': 'south buganda',
+    'sembabule': 'south buganda', 'ssembabule': 'south buganda', 'wakiso': 'south buganda',
+    'buikwe': 'north buganda', 'buvuma': 'north buganda', 'kayunga': 'north buganda',
+    'kiboga': 'north buganda', 'kyankwanzi': 'north buganda', 'luwero': 'north buganda',
+    'luweero': 'north buganda', 'mityana': 'north buganda', 'mubende': 'north buganda',
+    'kassanda': 'north buganda', 'mukono': 'north buganda', 'nakaseke': 'north buganda',
+    'nakasongola': 'north buganda',
+    'bugiri': 'busoga', 'bugweri': 'busoga', 'buyende': 'busoga', 'iganga': 'busoga',
+    'jinja': 'busoga', 'kaliro': 'busoga', 'kamuli': 'busoga', 'luuka': 'busoga',
+    'mayuge': 'busoga', 'namayingo': 'busoga', 'namutumba': 'busoga',
+    'budaka': 'bukedi', 'busia': 'bukedi', 'butaleja': 'bukedi', 'butebo': 'bukedi',
+    'kibuku': 'bukedi', 'pallisa': 'bukedi', 'tororo': 'bukedi',
+    'bududa': 'bugisu/elgon', 'bulambuli': 'bugisu/elgon', 'manafwa': 'bugisu/elgon',
+    'mbale': 'bugisu/elgon', 'namisindwa': 'bugisu/elgon', 'sironko': 'bugisu/elgon',
+    'kapchorwa': 'bugisu/elgon', 'kween': 'bugisu/elgon', 'bukwo': 'bugisu/elgon',
+    'amuria': 'teso', 'bukedea': 'teso', 'kaberamaido': 'teso', 'kalaki': 'teso',
+    'kapelebyong': 'teso', 'katakwi': 'teso', 'kumi': 'teso', 'ngora': 'teso',
+    'serere': 'teso', 'soroti': 'teso',
+    'abim': 'karamoja', 'amudat': 'karamoja', 'kaabong': 'karamoja', 'karenga': 'karamoja',
+    'kotido': 'karamoja', 'moroto': 'karamoja', 'nabilatuk': 'karamoja',
+    'nakapiripirit': 'karamoja', 'napak': 'karamoja',
+    'alebtong': 'lango', 'amolatar': 'lango', 'apac': 'lango', 'dokolo': 'lango',
+    'kole': 'lango', 'kwania': 'lango', 'lira': 'lango', 'otuke': 'lango', 'oyam': 'lango',
+    'agago': 'acholi', 'amuru': 'acholi', 'gulu': 'acholi', 'kitgum': 'acholi',
+    'lamwo': 'acholi', 'nwoya': 'acholi', 'omoro': 'acholi', 'pader': 'acholi',
+    'adjumani': 'west nile', 'arua': 'west nile', 'koboko': 'west nile',
+    'madi-okollo': 'west nile', 'madi okollo': 'west nile', 'maracha': 'west nile',
+    'moyo': 'west nile', 'nebbi': 'west nile', 'obongi': 'west nile',
+    'pakwach': 'west nile', 'terego': 'west nile', 'yumbe': 'west nile', 'zombo': 'west nile',
+    'buliisa': 'bunyoro', 'hoima': 'bunyoro', 'kagadi': 'bunyoro', 'kakumiro': 'bunyoro',
+    'kibaale': 'bunyoro', 'kikuube': 'bunyoro', 'kiryandongo': 'bunyoro', 'masindi': 'bunyoro',
+    'bundibugyo': 'tooro', 'bunyangabu': 'tooro', 'kabarole': 'tooro', 'kamwenge': 'tooro',
+    'kasese': 'tooro', 'kitagwenda': 'tooro', 'kitagwenga': 'tooro', 'kyenjojo': 'tooro',
+    'kyegegwa': 'tooro', 'ntoroko': 'tooro',
+    'buhweju': 'ankole', 'bushenyi': 'ankole', 'ibanda': 'ankole', 'isingiro': 'ankole',
+    'kazo': 'ankole', 'kiruhura': 'ankole', 'mbarara': 'ankole', 'mitooma': 'ankole',
+    'ntungamo': 'ankole', 'rubirizi': 'ankole', 'rubirzi': 'ankole', 'rwampara': 'ankole',
+    'sheema': 'ankole',
+    'kabale': 'kigezi', 'kanungu': 'kigezi', 'kisoro': 'kigezi', 'rubanda': 'kigezi',
+    'rukiga': 'kigezi', 'rukungiri': 'kigezi'
+}
+
+DHS_ALIASES = {
+    ('KE', 'tharaka'): 'tharaka nithi',
+    ('KE', 'elgeyo marakwet'): 'elgeyo marakwet',
+    ('KE', 'keiyo marakwet'): 'elgeyo marakwet',
+    ('TZ', 'mbeya'): 'mbeya',
+    ('TZ', 'pwani'): 'pwani',
+    ('TZ', 'coast'): 'pwani',
+    ('TZ', 'north pemba'): 'kaskazini pemba',
+    ('TZ', 'south pemba'): 'kusini pemba',
+    ('TZ', 'pemba north'): 'kaskazini pemba',
+    ('TZ', 'pemba south'): 'kusini pemba',
+    ('TZ', 'zanzibar north'): 'kaskazini unguja',
+    ('TZ', 'zanzibar south central'): 'kusini unguja',
+    ('TZ', 'zanzibar central south'): 'kusini unguja',
+    ('TZ', 'zanzibar west'): 'mjini magharibi',
+    ('TZ', 'zanzibar urban west'): 'mjini magharibi',
+    ('RW', 'east'): 'eastern',
+    ('RW', 'eastern'): 'eastern',
+    ('RW', 'north'): 'northern',
+    ('RW', 'northern'): 'northern',
+    ('RW', 'south'): 'southern',
+    ('RW', 'southern'): 'southern',
+    ('RW', 'west'): 'western',
+    ('RW', 'western'): 'western',
+    ('RW', 'kigali'): 'kigali',
+    ('BU', 'karuzi'): 'karusi',
+    ('BU', 'karusi'): 'karusi'
+}
+
 def load_dhs_indicators():
     path = "data/raw/regional/dhs_subnational_indicators.json"
     if not os.path.exists(path):
@@ -37,7 +118,6 @@ def load_dhs_indicators():
     with open(path, "r", encoding="utf-8") as f:
         records = json.load(f)
     
-    # Organize by country code (2-letter) and characteristic label (subnational region name)
     dhs_map = {}
     for r in records:
         cc = r.get("DHS_CountryCode") # KE, TZ, UG, RW, BU
@@ -47,6 +127,8 @@ def load_dhs_indicators():
         if not cc or not region or val is None:
             continue
         norm_reg = normalize_name(region)
+        # Apply alias
+        norm_reg = DHS_ALIASES.get((cc, norm_reg), norm_reg)
         key = (cc, norm_reg)
         if key not in dhs_map:
             dhs_map[key] = {}
@@ -73,5 +155,4 @@ def load_dhs_indicators():
             
     return dhs_map
 
-print("Helper functions and DHS loader loaded.")
-
+print("Helper functions, Uganda district subregion map, and DHS loader loaded.")

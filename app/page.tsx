@@ -224,9 +224,6 @@ export default function HomePage() {
     if (currentCountry && currentCountry.levels[nextLevel]?.available) {
       setSelectedLevel(nextLevel);
       setParentFilterId(properties.id);
-      if (nextLevel > 1 && selectedIndicator.category === "health_wellbeing") {
-        setSelectedIndicatorId("total_population");
-      }
       setBreadcrumbs((prev) => [
         ...prev,
         {
@@ -429,9 +426,6 @@ export default function HomePage() {
           onSelectLevel={(lvl) => {
             setSelectedLevel(lvl);
             setParentFilterId(null);
-            if (lvl > 1 && INDICATORS[selectedIndicatorId]?.category === "health_wellbeing") {
-              setSelectedIndicatorId("total_population");
-            }
           }}
           selectedIndicatorId={selectedIndicatorId}
           onSelectIndicator={setSelectedIndicatorId}

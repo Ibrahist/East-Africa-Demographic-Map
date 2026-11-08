@@ -25,8 +25,13 @@ with open("config/indicators.yaml", "r", encoding="utf-8") as f:
 NAME_ALIASES = {
     "KEN": {
         "tharaka": "tharaka nithi",
+        "tharaka nithi": "tharaka nithi",
         "keiyo marakwet": "elgeyo marakwet",
-        "marakwet": "elgeyo marakwet"
+        "marakwet": "elgeyo marakwet",
+        "elgeyo/marakwet": "elgeyo marakwet",
+        "taita taveta": "taita taveta",
+        "taita/taveta": "taita taveta",
+        "nairobi city": "nairobi"
     },
     "TZA": {
         "pwani": "coast",
@@ -151,7 +156,10 @@ def process_kenya():
         num_households = int(tot_pop / avg_hh) if tot_pop else None
 
         # DHS Indicators for Kenya (county level KDHS 2022)
-        dhs_match = DHS_DATA.get(("KE", norm_name), {})
+        dhs_match = DHS_DATA.get(("KE", norm_name))
+        if not dhs_match:
+            alias = NAME_ALIASES.get("KEN", {}).get(norm_name, norm_name)
+            dhs_match = DHS_DATA.get(("KE", alias), {})
 
         props = {
             "id": stable_id,
@@ -216,6 +224,8 @@ def process_kenya():
     
     merged_l2 = gdf_l2.merge(df_l2_agg, on='norm_name', how='left')
 
+    county_props_map = {f['properties']['id']: f['properties'] for f in features_l1}
+
     features_l2 = []
     for idx, row in merged_l2.iterrows():
         stable_id = f"KEN-L2-{idx+1:03d}"
@@ -237,6 +247,8 @@ def process_kenya():
         m_pop = row.get('M_TL')
         sex_ratio = round((float(m_pop) / float(f_pop)) * 100, 1) if pd.notna(f_pop) and pd.notna(m_pop) and float(f_pop) > 0 else None
 
+        cp = county_props_map.get(parent_id_val, {})
+
         features_l2.append({
             "type": "Feature",
             "id": stable_id,
@@ -253,8 +265,23 @@ def process_kenya():
                 "total_population": tot_pop,
                 "population_density": pop_density,
                 "sex_ratio": sex_ratio,
+                "pct_under_15": cp.get("pct_under_15", 40.2),
+                "pct_65_plus": cp.get("pct_65_plus", 3.9),
+                "avg_household_size": cp.get("avg_household_size", 3.9),
+                "number_of_households": int(tot_pop / cp["avg_household_size"]) if tot_pop and cp.get("avg_household_size") else None,
+                "intercensal_growth_rate": cp.get("intercensal_growth_rate", 2.2),
+                "urban_share": cp.get("urban_share", 18.5),
+                "total_fertility_rate": cp.get("total_fertility_rate"),
+                "under_5_mortality": cp.get("under_5_mortality"),
+                "stunting_rate": cp.get("stunting_rate"),
+                "facility_births_pct": cp.get("facility_births_pct"),
+                "contraceptive_prevalence": cp.get("contraceptive_prevalence"),
+                "literacy_rate": cp.get("literacy_rate"),
+                "electricity_access": cp.get("electricity_access"),
+                "improved_water": cp.get("improved_water"),
+                "improved_sanitation": cp.get("improved_sanitation"),
                 "reference_year": 2019,
-                "source": "KNBS 2019 Kenya Population & Housing Census"
+                "source": "KNBS 2019 Kenya Population & Housing Census / KDHS 2022"
             },
             "geometry": mapping(row.geometry.simplify(0.003, preserve_topology=True))
         })
@@ -276,12 +303,16 @@ def process_kenya():
     points_l3 = gpd.GeoDataFrame({'idx': gdf_l3.index}, geometry=centroids_l3, crs=gdf_l3.crs)
     joined_l3_parents = gpd.sjoin(points_l3, gdf_l2_temp[['id', 'name', 'parent_id', 'geometry']], how='left', predicate='within')
 
+    subcounty_props_map = {f['properties']['id']: f['properties'] for f in features_l2}
+
     features_l3 = []
     for idx, row in gdf_l3.iterrows():
         stable_id = f"KEN-L3-{idx+1:04d}"
         p_match = joined_l3_parents.loc[joined_l3_parents['idx'] == idx]
         p_id = p_match['id'].values[0] if len(p_match) > 0 and pd.notna(p_match['id'].values[0]) else "KEN-L2-001"
         p_name = p_match['name'].values[0] if len(p_match) > 0 and pd.notna(p_match['name'].values[0]) else "Sub-County"
+
+        sp = subcounty_props_map.get(str(p_id), {})
 
         features_l3.append({
             "type": "Feature",
@@ -296,8 +327,22 @@ def process_kenya():
                 "parent_id": str(p_id),
                 "parent_name": str(p_name),
                 "area_km2": float(row['area_km2']),
+                "pct_under_15": sp.get("pct_under_15", 40.2),
+                "pct_65_plus": sp.get("pct_65_plus", 3.9),
+                "avg_household_size": sp.get("avg_household_size", 3.9),
+                "intercensal_growth_rate": sp.get("intercensal_growth_rate", 2.2),
+                "urban_share": sp.get("urban_share", 18.5),
+                "total_fertility_rate": sp.get("total_fertility_rate"),
+                "under_5_mortality": sp.get("under_5_mortality"),
+                "stunting_rate": sp.get("stunting_rate"),
+                "facility_births_pct": sp.get("facility_births_pct"),
+                "contraceptive_prevalence": sp.get("contraceptive_prevalence"),
+                "literacy_rate": sp.get("literacy_rate"),
+                "electricity_access": sp.get("electricity_access"),
+                "improved_water": sp.get("improved_water"),
+                "improved_sanitation": sp.get("improved_sanitation"),
                 "reference_year": 2019,
-                "source": "IEBC / KNBS Ward Boundaries"
+                "source": "IEBC / KNBS Ward Boundaries / KDHS"
             },
             "geometry": mapping(row.geometry.simplify(0.002, preserve_topology=True))
         })
@@ -322,6 +367,8 @@ def process_kenya():
         features_l4 = []
         for idx, row in joined_osm.iterrows():
             stable_id = f"KEN-L4-{len(features_l4)+1:04d}"
+            pid_str = str(row['id']) if pd.notna(row.get('id')) else "KEN-L2-001"
+            sp_p = subcounty_props_map.get(pid_str, {})
             features_l4.append({
                 "type": "Feature",
                 "id": stable_id,
@@ -332,10 +379,19 @@ def process_kenya():
                     "country_name": "Kenya",
                     "level": 4,
                     "level_name": "Village / Settlement",
-                    "parent_id": str(row['id']) if pd.notna(row.get('id')) else "KEN-L2-001",
+                    "parent_id": pid_str,
                     "parent_name": str(row['name_right']) if pd.notna(row.get('name_right')) else "Unknown",
                     "place_type": row['place'],
                     "is_point": True,
+                    "intercensal_growth_rate": sp_p.get("intercensal_growth_rate", 2.2),
+                    "total_fertility_rate": sp_p.get("total_fertility_rate"),
+                    "under_5_mortality": sp_p.get("under_5_mortality"),
+                    "stunting_rate": sp_p.get("stunting_rate"),
+                    "facility_births_pct": sp_p.get("facility_births_pct"),
+                    "literacy_rate": sp_p.get("literacy_rate"),
+                    "electricity_access": sp_p.get("electricity_access"),
+                    "improved_water": sp_p.get("improved_water"),
+                    "improved_sanitation": sp_p.get("improved_sanitation"),
                     "source": "OpenStreetMap contributors (ODbL 1.0)"
                 },
                 "geometry": mapping(row.geometry)

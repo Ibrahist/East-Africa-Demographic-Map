@@ -250,9 +250,13 @@ export const PlaceDetailsModal: React.FC<PlaceDetailsModalProps> = ({
                   <span className="text-[#656d76] dark:text-[#8b949e]">Avg Household Size:</span>
                   <span className="font-semibold">{p.avg_household_size ? `${p.avg_household_size.toFixed(1)} people` : "N/A"}</span>
                 </div>
-                <div className="flex justify-between py-0.5">
+                <div className="flex justify-between py-0.5 border-b border-[#d0d7de]/40 dark:border-[#30363d]/40">
                   <span className="text-[#656d76] dark:text-[#8b949e]">Annual Growth Rate:</span>
-                  <span className="font-semibold">{p.intercensal_growth_rate ? `${p.intercensal_growth_rate.toFixed(2)}%` : "N/A"}</span>
+                  <span className="font-semibold">{p.intercensal_growth_rate !== undefined && p.intercensal_growth_rate !== null ? `${p.intercensal_growth_rate.toFixed(2)}%` : "N/A"}</span>
+                </div>
+                <div className="flex justify-between py-0.5">
+                  <span className="text-[#656d76] dark:text-[#8b949e]">Urban Population Share:</span>
+                  <span className="font-semibold">{p.urban_share !== undefined && p.urban_share !== null ? `${p.urban_share.toFixed(1)}%` : "N/A"}</span>
                 </div>
               </div>
             </div>
@@ -266,19 +270,23 @@ export const PlaceDetailsModal: React.FC<PlaceDetailsModalProps> = ({
               <div className="space-y-1.5 text-[11px]">
                 <div className="flex justify-between py-0.5 border-b border-[#d0d7de]/40 dark:border-[#30363d]/40">
                   <span className="text-[#656d76] dark:text-[#8b949e]">Total Fertility Rate (TFR):</span>
-                  <span className="font-semibold">{p.total_fertility_rate ? `${p.total_fertility_rate.toFixed(1)}` : "N/A (L1 only)"}</span>
+                  <span className="font-semibold">{p.total_fertility_rate !== undefined && p.total_fertility_rate !== null ? `${p.total_fertility_rate.toFixed(1)}` : "N/A"}</span>
                 </div>
                 <div className="flex justify-between py-0.5 border-b border-[#d0d7de]/40 dark:border-[#30363d]/40">
                   <span className="text-[#656d76] dark:text-[#8b949e]">Under-5 Mortality Rate:</span>
-                  <span className="font-semibold">{p.under_5_mortality ? `${p.under_5_mortality.toFixed(1)} /1,000` : "N/A (L1 only)"}</span>
+                  <span className="font-semibold">{p.under_5_mortality !== undefined && p.under_5_mortality !== null ? `${p.under_5_mortality.toFixed(1)} /1,000` : "N/A"}</span>
                 </div>
                 <div className="flex justify-between py-0.5 border-b border-[#d0d7de]/40 dark:border-[#30363d]/40">
                   <span className="text-[#656d76] dark:text-[#8b949e]">Child Stunting Prevalence:</span>
-                  <span className="font-semibold">{p.stunting_rate ? `${p.stunting_rate.toFixed(1)}%` : "N/A (L1 only)"}</span>
+                  <span className="font-semibold">{p.stunting_rate !== undefined && p.stunting_rate !== null ? `${p.stunting_rate.toFixed(1)}%` : "N/A"}</span>
+                </div>
+                <div className="flex justify-between py-0.5 border-b border-[#d0d7de]/40 dark:border-[#30363d]/40">
+                  <span className="text-[#656d76] dark:text-[#8b949e]">Facility-Based Deliveries:</span>
+                  <span className="font-semibold">{p.facility_births_pct !== undefined && p.facility_births_pct !== null ? `${p.facility_births_pct.toFixed(1)}%` : "N/A"}</span>
                 </div>
                 <div className="flex justify-between py-0.5">
-                  <span className="text-[#656d76] dark:text-[#8b949e]">Facility-Based Deliveries:</span>
-                  <span className="font-semibold">{p.facility_births_pct ? `${p.facility_births_pct.toFixed(1)}%` : "N/A (L1 only)"}</span>
+                  <span className="text-[#656d76] dark:text-[#8b949e]">Contraceptive Prevalence:</span>
+                  <span className="font-semibold">{p.contraceptive_prevalence !== undefined && p.contraceptive_prevalence !== null ? `${p.contraceptive_prevalence.toFixed(1)}%` : "N/A"}</span>
                 </div>
               </div>
             </div>

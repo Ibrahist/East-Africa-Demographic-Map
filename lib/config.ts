@@ -434,7 +434,7 @@ export const INDICATORS: Record<string, IndicatorConfig> = {
     format: "integer",
     color_palette: "Blues",
     description: "Total count of enumerated private households.",
-    comparable_east_africa: false,
+    comparable_east_africa: true,
     reference_note: "Available for Kenya, Tanzania, Rwanda."
   },
   intercensal_growth_rate: {
@@ -456,7 +456,7 @@ export const INDICATORS: Record<string, IndicatorConfig> = {
     format: "percent_1",
     color_palette: "PuRd",
     description: "Percentage of the population residing in gazetted urban centers or cities.",
-    comparable_east_africa: false,
+    comparable_east_africa: true,
     reference_note: "National urban definitions vary between countries."
   },
   total_fertility_rate: {
