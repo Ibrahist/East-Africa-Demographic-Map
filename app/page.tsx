@@ -29,37 +29,16 @@ export default function HomePage() {
   const [selectedPalette, setSelectedPalette] = useState<string>("Viridis");
   const [scaleMode, setScaleMode] = useState<"shared" | "per-country">("shared");
   const [opacity, setOpacity] = useState<number>(0.75);
-  const [baseMapStyle, setBaseMapStyle] = useState<"light" | "dark" | "satellite">("light");
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [baseMapStyle, setBaseMapStyle] = useState<"light" | "dark" | "satellite">("dark");
 
-  // Sync GitHub theme with DOM & localStorage on mount (independent from baseMapStyle)
+  // Ensure Dark Mode is permanently active on mount
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const saved = localStorage.getItem("gh-theme") as "light" | "dark" | null;
-    const preferred = saved || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-    setTheme(preferred);
-    if (preferred === "dark") {
+    if (typeof window !== "undefined") {
       document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
     }
   }, []);
 
-  // Toggle app theme for navbar, sidebars, controls without changing Base Map Canvas color
-  const handleToggleTheme = () => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("gh-theme", next);
-      if (next === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-      return next;
-    });
-  };
-
-  // Change Base Map Canvas independently without affecting app UI theme
+  // Change Base Map Canvas independently
   const handleChangeBaseMap = (style: "light" | "dark" | "satellite") => {
     setBaseMapStyle(style);
   };
@@ -317,6 +296,18 @@ export default function HomePage() {
     ]);
   };
 
+  // Auto-open dossier if a search result feature was selected
+  useEffect(() => {
+    if (hoveredFeatureId && filteredGeojson?.features) {
+      const match = filteredGeojson.features.find(
+        (f: any) => f.properties?.id === hoveredFeatureId
+      );
+      if (match) {
+        setSelectedPlaceFeature(match);
+      }
+    }
+  }, [filteredGeojson, hoveredFeatureId]);
+
   // CSV Export
   const handleExportCSV = () => {
     if (!filteredGeojson || !filteredGeojson.features) return;
@@ -430,7 +421,7 @@ export default function HomePage() {
     selectedCountry === "EAF" ? "All East Africa" : COUNTRIES[selectedCountry]?.name || selectedCountry;
 
   return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-white dark:bg-[#0d1117] text-[#1f2328] dark:text-[#f0f6fc]">
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#0d1117] text-[#e6edf3]">
       {/* Top Application Bar (GitHub Header) */}
       <Header
         onToggleSidebar={() => setIsSidebarOpen((prev) => !prev)}
@@ -438,8 +429,6 @@ export default function HomePage() {
         onUpdateApiKey={setApiKey}
         onSelectSearchResult={handleSelectSearchResult}
         allFeaturesIndex={allFeaturesIndex}
-        theme={theme}
-        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Workspace Layout */}
