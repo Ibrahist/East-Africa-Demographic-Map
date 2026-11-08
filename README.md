@@ -9,11 +9,11 @@ An interactive, high-performance choropleth web mapping application visualizing 
 * **Dual Rendering Engine:**
   * **Engine 1 (Google Maps JS API):** Renders high-performance vector polygons on Google Maps Roadmap, Dark, or Satellite hybrid imagery via the Data layer (`map.data.addGeoJson` / `map.data.setStyle`).
   * **Engine 2 (Instant SVG Vector Choropleth):** True conformal equirectangular projection with cosine latitude compensation that works right out of the box with zero setup or API key requirement. Includes drag pan, scroll wheel zoom, and view reset.
-* **GitHub Primer Design System:**
-  * Authentic GitHub Light and Dark themes with one-click header switcher and automatic system preference detection.
-  * Styled with GitHub Primer design tokens, borders, badges, cards, buttons, and custom scrollbars.
+* **GitHub Dark Primer Design System:**
+  * Clean, authentic GitHub Dark interface styled with Primer design tokens (`#0d1117` canvas, `#161b22` panels, `#30363d` borders, and `#2f81f7` blue accents), badges, cards, buttons, and custom scrollbars.
 * **Google Sans Flex Typography:**
   * Beautiful variable optical-sizing typography applied globally across all UI components, controls, tables, and tooltips.
+* **Harmonized Administrative Hierarchy:**
   * Maps Country → Level 1 → Level 2 → Level 3 → Level 4 (Settlements/Points), while displaying country-specific official names (e.g. *County* in Kenya, *Region* in Tanzania, *District* in Uganda, *Province* in Rwanda and Burundi).
 * **Multi-Country & Regional Modes:**
   * Toggle between individual country views or **"All East Africa"** for unified cross-border comparison.
@@ -21,12 +21,17 @@ An interactive, high-performance choropleth web mapping application visualizing 
   * Real-time vector classification using **Quantile**, **Natural Breaks**, or **Equal Interval** methods.
   * Color-blind safe palettes (Viridis, Cividis, YlOrRd, YlGnBu, Blues, Purples, Greens, Plasma).
   * Opacity slider and dark/light/satellite base map canvases.
-* **Rich Spatial Interaction:**
-  * **Hover Tooltip:** Shows administrative unit name, parent entity, indicator value with unit, population, area, sex ratio, census reference year, rank within country, and rank within displayed set.
-  * **Click-to-Drill-Down:** Clicking any unit zooms in and lazy-loads the next administrative level filtered by that parent unit.
+* **Rich Spatial Interaction & Full Details on Hover:**
+  * **Comprehensive Hover Tooltip:** Displays official unit name, parent entity, indicator value with unit, census population, density, land area, sex ratio, age cohorts (<15, 65+), household size, DHS health indicators (TFR, U5MR, stunting, facility births), infrastructure metrics (literacy, electricity, water, sanitation), census reference year, rank within country, and rank within displayed set.
+  * **Individual Place Export Studio:** Clicking any place or selecting from search opens an interactive dossier modal with individual exports:
+    * **PDF Report**: Publication-grade demographic dossier generated via `jspdf` & `jspdf-autotable`.
+    * **CSV Attributes**: Tabular spreadsheet of that individual unit's complete demographic and spatial data.
+    * **GeoJSON Feature**: Clean GeoJSON polygon boundary with all metadata properties.
+    * **ESRI Shapefile (ZIP)**: Complete `.shp`, `.shx`, `.dbf`, `.prj`, `.cpg` suite generated dynamically via the GeoPandas backend route (`/api/export/shapefile`).
+  * **Click-to-Drill-Down:** Option to drill down and explore lower-level sub-units partitioned by parent ID.
   * **Global Search:** Fast autocomplete search across any county, region, district, or ward in East Africa.
   * **Breadcrumbs:** Breadcrumb trail (`All East Africa > Country > Level 1 > Level 2`) for intuitive navigation back up the tree.
-* **Data Export:**
+* **Viewport Data Export:**
   * **Download CSV:** Exports the current view's features, parents, and indicators as a tabular CSV.
   * **Export Map PNG:** Captures the current map view and legend into a high-resolution PNG image.
 * **Data Pipeline:**
