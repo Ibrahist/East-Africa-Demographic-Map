@@ -7,6 +7,7 @@ import { MapView } from "../components/Map";
 import { Tooltip } from "../components/Tooltip";
 import { Legend } from "../components/Legend";
 import { Breadcrumbs, BreadcrumbItem } from "../components/Breadcrumbs";
+import { PlaceDetailsModal } from "../components/PlaceDetailsModal";
 import { COUNTRIES, REGION_CONFIG, INDICATORS } from "../lib/config";
 import { FeatureProperties, TooltipState } from "../lib/types";
 import {
@@ -71,6 +72,9 @@ export default function HomePage() {
     { id: "EAF", name: "All East Africa", level: 0 }
   ]);
   const [parentFilterId, setParentFilterId] = useState<string | null>(null);
+
+  // Selected place for Full Details & Export Modal
+  const [selectedPlaceFeature, setSelectedPlaceFeature] = useState<any | null>(null);
 
   // Loaded GeoJSON data
   const [rawGeojson, setRawGeojson] = useState<any>(null);
@@ -205,12 +209,25 @@ export default function HomePage() {
     );
   }, [breaks, selectedPalette, selectedIndicator]);
 
-  // Drill down when a feature is clicked
-  const handleFeatureClick = useCallback((properties: FeatureProperties) => {
+  // Open full Place Dossier & Export Modal on feature click
+  const handleFeatureClick = useCallback(
+    (properties: FeatureProperties) => {
+      const feat =
+        filteredGeojson?.features?.find((f: any) => f.properties?.id === properties.id) || {
+          type: "Feature",
+          properties,
+          geometry: null,
+        };
+      setSelectedPlaceFeature(feat);
+    },
+    [filteredGeojson]
+  );
+
+  // Drill down when triggered from the Place Dossier Modal
+  const handleDrillDownFromModal = (properties: FeatureProperties) => {
     if (properties.is_point) return;
 
     if (selectedCountry === "EAF") {
-      // Clicking a country polygon in regional view switches to that country Level 1
       const iso = properties.country_iso3;
       setSelectedCountry(iso);
       setSelectedLevel(1);
@@ -241,7 +258,7 @@ export default function HomePage() {
         },
       ]);
     }
-  }, [selectedCountry, selectedLevel]);
+  };
 
   // Handle Breadcrumb navigation
   const handleBreadcrumbSelect = (item: BreadcrumbItem) => {
@@ -518,6 +535,25 @@ export default function HomePage() {
               }
             />
           </div>
+
+          {/* Place Full Details & Individual Export Modal */}
+          {selectedPlaceFeature && (
+            <PlaceDetailsModal
+              feature={selectedPlaceFeature}
+              indicator={selectedIndicator}
+              countryName={
+                COUNTRIES[selectedPlaceFeature.properties?.country_iso3]?.name ||
+                selectedPlaceFeature.properties?.country_name ||
+                activeCountryName
+              }
+              onClose={() => setSelectedPlaceFeature(null)}
+              onDrillDown={handleDrillDownFromModal}
+              canDrillDown={
+                selectedCountry === "EAF" ||
+                Boolean(COUNTRIES[selectedCountry]?.levels[selectedLevel + 1]?.available)
+              }
+            />
+          )}
         </main>
       </div>
     </div>
