@@ -307,8 +307,11 @@ export const PlaceExportMenu: React.FC<PlaceExportMenuProps> = ({
         )}
 
         {/* Source citation */}
-        <div className="text-[9px] text-[#8b949e] border-t border-[#30363d] pt-2">
-          <span>Census Year: {p.reference_year || "N/A"} • Source: {p.source || "Official Agency"}</span>
+        <div className="text-[9px] text-[#8b949e] border-t border-[#30363d] pt-2 space-y-1.5">
+          <div>Census Year: {p.reference_year || "N/A"} • Source: {p.source || "Official Agency"}</div>
+          <div className="p-2 rounded-md bg-[#bb800918] border border-[#d29922]/30 text-[#d29922] text-[9.5px] leading-relaxed">
+            <strong>Warning / Notice:</strong> If you want to use this data by any means, you should contact the owners of the original data (national statistics bureaus & DHS).
+          </div>
         </div>
       </div>
 

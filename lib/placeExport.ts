@@ -42,6 +42,7 @@ export function exportPlaceCSV(feature: any, countryName: string, indicator: Ind
     ["Selected Metric", indicator.label, formatValue(p[indicator.id], indicator.format, indicator.unit)],
     ["Census Reference Year", p.reference_year ? String(p.reference_year) : "N/A", "Year of baseline census"],
     ["Data Source", p.source || "National Statistical Agency", "Source attribution"],
+    ["Data Usage Notice", "If you want to use this data by any means, you should contact the owners of the original data", "KNBS, NBS, UBOS, NISR, ISTEEBU, The DHS Program"],
   ];
 
   const csvContent = [
@@ -237,8 +238,13 @@ export function exportPlacePDF(feature: any, countryName: string, indicator: Ind
 
   // Footer notes & timestamp
   const footerY = (doc as any).lastAutoTable?.finalY || 240;
-  doc.setFontSize(7.5);
+  doc.setFontSize(6.8);
   doc.setTextColor(140, 149, 159);
+  doc.text(
+    "DATA USAGE NOTICE: If you want to use this data by any means, you should contact the owners of the original data (KNBS, NBS, UBOS, NISR, ISTEEBU, DHS).",
+    14,
+    Math.min(280, footerY + 8)
+  );
   doc.text(
     `Exported from East Africa Demographic GIS Platform on ${new Date().toLocaleDateString()} | Projections: Africa Albers Equal Area Conic (ESRI:102022) | WGS84`,
     14,

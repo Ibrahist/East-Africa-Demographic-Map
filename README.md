@@ -2,6 +2,10 @@
 
 An interactive, high-performance choropleth web mapping application visualizing administrative hierarchies and public census demographics across East Africa (**Kenya**, **Tanzania**, **Uganda**, **Rwanda**, and **Burundi**), built with **Next.js**, **TypeScript**, and the **Google Maps JavaScript API** Data layer.
 
+> [!WARNING]
+> **Data Usage Notice & Owner Permissions:**  
+> If you want to use this data by any means, you should contact the owners of the original data (the respective national statistics bureaus: **KNBS**, **NBS Tanzania / OCGS**, **UBOS**, **NISR**, **ISTEEBU**, and **The DHS Program**). This platform visualizes public statistical records for informational, research, and educational purposes only; commercial reuse, redistribution, or derivation must comply with each original data custodian's licensing and authorization policies.
+
 ---
 
 ## 1. Features & Architecture
@@ -209,6 +213,10 @@ The automated pipeline tests census totals against official statistical publicat
 ---
 
 ## 8. Data Sources, Acquisition & Open Data Policy
+
+> [!WARNING]
+> **Data Usage Notice & Owner Permissions:**  
+> If you want to use this data by any means, you should contact the owners of the original data. All demographic figures, survey indicators, and boundary geometries belong to their respective originating institutions (**KNBS**, **NBS Tanzania**, **OCGS Zanzibar**, **UBOS**, **NISR**, **ISTEEBU**, and **The DHS Program / USAID**). Users intending to publish, commercialize, or redistribute these datasets must seek formal approval and licensing directly from the appropriate original custodians.
 
 > [!IMPORTANT]
 > **Exclusive Use of Publicly Available Open Data**  

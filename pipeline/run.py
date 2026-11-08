@@ -87,7 +87,7 @@ def process_tanzania():
     aliases = NAME_ALIASES.get(iso, {})
     gdf_l1['norm_name'] = gdf_l1['norm_name'].apply(lambda x: aliases.get(x, x))
 
-    df_l1['norm_name'] = df_l1['ADM1_EN'].dropna().apply(normalize_name)
+    df_l1['norm_name'] = df_l1['ADM1_EN'].dropna().apply(normalize_name).apply(lambda x: aliases.get(x, x))
     df_l1_agg = df_l1.groupby('norm_name').first().reset_index()
 
     merged_l1 = gdf_l1.merge(df_l1_agg, on='norm_name', how='left')
@@ -353,6 +353,8 @@ def process_tanzania():
 
     if unmatched:
         pd.DataFrame(unmatched).to_csv("data/unmatched_TZA.csv", index=False)
+    elif os.path.exists("data/unmatched_TZA.csv"):
+        os.remove("data/unmatched_TZA.csv")
     print("Tanzania processing finished successfully!")
     return features_l1
 
@@ -632,7 +634,7 @@ def process_rwanda():
     aliases = NAME_ALIASES.get(iso, {})
     gdf_l1['norm_name'] = gdf_l1['norm_name'].apply(lambda x: aliases.get(x, x))
 
-    df_l1['norm_name'] = df_l1['ADM1_EN'].dropna().apply(normalize_name)
+    df_l1['norm_name'] = df_l1['ADM1_EN'].dropna().apply(normalize_name).apply(lambda x: aliases.get(x, x))
     df_l1_agg = df_l1.groupby('norm_name').first().reset_index()
 
     merged_l1 = gdf_l1.merge(df_l1_agg, on='norm_name', how='left')

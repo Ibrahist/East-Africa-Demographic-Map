@@ -318,6 +318,11 @@ export const PlaceDetailsModal: React.FC<PlaceDetailsModalProps> = ({
             </div>
           </div>
 
+          {/* Data Ownership & Usage Warning Banner */}
+          <div className="p-2.5 rounded-lg bg-[#fff8c5] dark:bg-[#bb800918] border border-[#d4a72c] dark:border-[#d29922]/30 text-[#9a6700] dark:text-[#d29922] text-[10.5px] leading-relaxed">
+            <strong>Data Usage Notice:</strong> If you want to use this data by any means, you should contact the owners of the original data (national statistics bureaus & DHS Program).
+          </div>
+
           {/* Metadata Footer */}
           <div className="text-[10px] text-[#656d76] dark:text-[#8b949e] border-t border-[#d0d7de] dark:border-[#30363d] pt-2 flex flex-col sm:flex-row justify-between gap-1">
             <div>

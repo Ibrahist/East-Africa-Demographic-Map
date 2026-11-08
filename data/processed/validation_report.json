@@ -10,14 +10,14 @@
     "status": "PASSED"
   },
   "TZA": {
-    "sum_level1_population": 65014784,
+    "sum_level1_population": 60216349,
     "census_official": 61741120,
     "reference_year": 2022,
-    "census_difference_pct": 5.3,
+    "census_difference_pct": 2.47,
     "worldpop_benchmark": 61500000,
-    "worldpop_difference_pct": 5.72,
+    "worldpop_difference_pct": 2.09,
     "feature_count": 30,
-    "status": "WARNING"
+    "status": "PASSED"
   },
   "UGA": {
     "sum_level1_population": 45926514,
