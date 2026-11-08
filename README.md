@@ -312,3 +312,11 @@ For full raw file paths, SHA checksums, data formats, and individual field dicti
 * [`data/SOURCES.md`](file:///d:/East%20Africa%20Demographic%20Map/data/SOURCES.md)
 * [`STEP_1_DATA_DISCOVERY_REPORT.md`](file:///C:/Users/ibrahxbt/.gemini/antigravity/brain/ce62b777-b709-48cb-be42-8359b89e28dc/STEP_1_DATA_DISCOVERY_REPORT.md)
 
+---
+
+### F. Icon & Graphic Attribution
+
+* **App Logo & Browser Favicon:**
+  * <a href="https://www.flaticon.com/free-icons/africa" title="africa icons">Africa icons created by Kalashnyk - Flaticon</a>
+  * Used for the application header branding, browser favicon, and apple touch icon. Licensed under Flaticon Basic License with Attribution.
+

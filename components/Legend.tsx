@@ -66,6 +66,18 @@ export const Legend: React.FC<LegendProps> = ({
             {sourceNote}
           </div>
         )}
+        <div className="pt-1 text-[8px] text-[#656d76] dark:text-[#8b949e]">
+          Icon:{" "}
+          <a
+            href="https://www.flaticon.com/free-icons/africa"
+            title="africa icons"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline text-[#0969da] dark:text-[#58a6ff]"
+          >
+            Africa icons created by Kalashnyk - Flaticon
+          </a>
+        </div>
       </div>
     </div>
   );
